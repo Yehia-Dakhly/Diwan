@@ -1,0 +1,45 @@
+﻿@model Diwan.PL.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="auth-container">
+    <h2 class="auth-title">Welcome Back To Diwan</h2>
+
+    <form asp-action="Login">
+        <div class="full-width">
+            <label asp-for="Email">Email</label>
+            <input asp-for="Email" placeholder="Enter your email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="full-width">
+            <label asp-for="Password">Password</label>
+            <input asp-for="Password" type="password" placeholder="Enter your password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="full-width remember-me">
+            <input asp-for="RememberMe" type="checkbox" />
+            <label asp-for="RememberMe">Remember Me</label>
+        </div>
+
+        <button type="submit">Login</button>
+
+        <div class="text-center">
+            <p>Don’t have an account? <a asp-action="Register">Create one</a></p>
+        </div>
+    </form>
+</div>
+
+@section _ValidationScriptsPartial {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@section AuthSection {
+    <partial name="AuthSection" />
+    <link rel="stylesheet" href="~/css/Login.css" />
+}
+
+

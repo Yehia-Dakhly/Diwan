@@ -1,0 +1,70 @@
+﻿@model IEnumerable<DiwanUserViewModel>
+@{
+    ViewData["Title"] = "Find Friends";
+}
+
+<h1>Find Friends</h1>
+<hr />
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form asp-action="AddFriend" method="get" class="d-flex">
+            <input type="text" name="UserName" class="form-control me-2" placeholder="Search by name..." />
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <h4>Search Results</h4>
+    @foreach (var user in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+
+                    <img src="~/Files/Images/@user.PictureURL" alt="Profile Picture" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;" />
+
+                    <div class="flex-grow-1">
+                        <h5 class="card-title">@user.FirstName @user.LastName</h5>
+                        <p class="card-text text-muted">@user.Bio</p>
+                    </div>
+
+                    <div>
+                        @if (user.FriendshipStatus == null || user.FriendshipStatus == FriendRequestStatus.Declined)
+                        {
+                            <form asp-action="RequestFriend" method="post">
+                                <input type="hidden" name="addresseeId" value="@user.Id" />
+                                <button type="submit" class="btn btn-success">Add Friend</button>
+                            </form>
+                        }
+                        else if (user.FriendshipStatus == FriendRequestStatus.Pending)
+                        {
+                            @if (user.IsFriendshipInitiator)
+                            {
+                                <button class="btn btn-secondary" disabled>Request Sent</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-info">Respond to Request</button>
+                                // Add Here FriendRequests Action Button!!!
+                            }
+                        }
+                        else if (user.FriendshipStatus == FriendRequestStatus.Accepted)
+                        {
+                            <span class="badge bg-primary p-2">Friends</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>No users found. Try searching for someone.</p>
+}
+
+
+                

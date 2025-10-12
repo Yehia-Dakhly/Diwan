@@ -1,0 +1,123 @@
+﻿@model Diwan.PL.ViewModels.UserProfileViewModel
+@using Diwan.DAL.Enums
+
+@{
+    ViewData["Title"] = Model.FullName;
+}
+
+<style>
+    .profile-header {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    .cover-photo {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    .profile-picture {
+        position: absolute;
+        bottom: -75px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 5px solid white;
+        object-fit: cover;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .profile-info {
+        text-align: center;
+        margin-top: 90px; /* Space for the profile picture */
+    }
+    .profile-actions {
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 40px;
+    }
+    .post-card {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        padding: 20px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+</style>
+
+<div class="profile-header">
+    <img src="~/Files/Posts/@Model.CoverPicURL" alt="Cover Photo" class="cover-photo shadow-sm" />
+    <img src="~/Files/Posts/@Model.PictureURL" alt="Profile Picture" class="profile-picture" />
+</div>
+
+<div class="profile-info">
+    <h1 class="display-5">@Model.FullName</h1>
+    <p class="lead text-muted">"@(Model.Bio ?? "قارئ وكاتب في ديوان")"</p>
+</div>
+
+<div class="profile-actions">
+    @if (Model.IsCurrentUserProfile)
+    {
+        <a asp-action="Edit" asp-controller="Profile" class="btn btn-outline-secondary">تعديل الملف الشخصي</a>
+    }
+    else
+    {
+        @if (Model.FriendshipStatus == null)
+        {
+            <form asp-action="RequestFriend" asp-controller="Friendships" method="post">
+                <input type="hidden" name="addresseeId" value="@Model.Id" />
+                <button type="submit" class="btn btn-success"><i class="fas fa-user-plus"></i> إضافة صديق</button>
+            </form>
+        }
+        else if (Model.FriendshipStatus == FriendRequestStatus.Pending)
+        {
+            @if (Model.IsFriendshipInitiator)
+            {
+                <button class="btn btn-secondary" disabled>تم إرسال الطلب</button>
+            }
+            else
+            {
+                <a asp-action="Index" asp-controller="FriendRequests" class="btn btn-info">الرد على الطلب</a>
+            }
+        }
+        else if (Model.FriendshipStatus == FriendRequestStatus.Accepted)
+        {
+            <button class="btn btn-primary" disabled><i class="fas fa-check"></i> أصدقاء</button>
+        }
+        else
+        {
+            <form asp-action="RequestFriend" asp-controller="Friendships" method="post">
+                <input type="hidden" name="addresseeId" value="@Model.Id" />
+                <button type="submit" class="btn btn-success"><i class="fas fa-user-plus"></i> إضافة صديق</button>
+            </form>
+        }
+    }
+</div>
+
+<hr />
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h3 class="mb-4 text-center">منشورات @Model.FullName</h3>
+        @if (Model.Posts != null && Model.Posts.Any())
+        {
+            @foreach (var post in Model.Posts)
+            {
+                <div class="post-card shadow-sm">
+                    <p>@post.Content</p>
+                    @if (post.PictureURL != null)
+                    {
+                        <img src="~/Files/Posts/@post.PictureURL" class="img-fluid rounded mb-2" alt="Post Image" />
+                    }
+                    <small class="text-muted">نُشر بتاريخ: @post.CreatedAt.ToShortDateString()</small>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center text-muted">لم يقم هذا المستخدم بنشر أي شيء بعد.</p>
+        }
+    </div>
+</div>

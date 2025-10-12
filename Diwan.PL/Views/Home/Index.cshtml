@@ -1,0 +1,48 @@
+﻿@model IEnumerable<PostViewModel>
+@{
+    ViewData["Title"] = "Index";
+}
+<a asp-action="CreatePost"  class="btn btn-success">Add New Post</a>
+
+<br />
+<br />
+@if (Model is not null && Model.Any())
+{
+    <div class="posts-container">
+        @foreach (var post in Model)
+        {
+            <div class="post-card">
+                <div class="post-header">
+                    <img src="~/Files/Images/@post.UserPictureURL" class="rounded height="40" width="40" alt="No Image">
+                    <div>
+                        <h3>@post.FullName</h3>
+                        <span class="post-date">@post?.CreatedAt.ToString("MMM dd, yyyy")</span>
+                    </div>
+                </div>
+
+                <div class="post-body">
+                    <p>@post?.Content</p>
+
+                    @if (!string.IsNullOrEmpty(post?.PictureURL))
+                    {
+                        <img src="~/Files/Posts/@post.PictureURL" class="rounded height="150" width="150" alt="No Image">
+                    }
+                </div>
+
+                <div class="post-footer">
+                    <span>@(post.CommentCount) 💬 Comments</span>
+                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Like).Count()) 👍🏻</span>
+                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Love).Count()) ❤️</span>
+                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Haha).Count()) 😂</span>
+                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Wow).Count()) 😮</span>
+                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Sad).Count()) 😭</span>
+                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Angry).Count()) 😡</span>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <h2 class="no-content">There's no content</h2>
+}

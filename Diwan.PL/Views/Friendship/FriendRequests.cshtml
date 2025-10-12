@@ -1,0 +1,39 @@
+﻿@model IEnumerable<FriendshipViewModel>
+@{
+    ViewData["Title"] = "طلبات الصداقة";
+}
+
+<h1>طلبات الصداقة</h1>
+<hr />
+
+@if (Model.Any())
+{
+    @foreach (var request in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <img src="~/Files/Images/@request.RequesterPictureUrl" alt="Profile Picture" class="rounded-circle me-3" style="width: 60px; height: 60px;" />
+                    <div>
+                        <h5 class="card-title mb-0">@request.RequesterName</h5>
+                        <small class="text-muted">أرسل لك طلب صداقة بتاريخ @request.CreatedAt.ToShortDateString()</small>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <form asp-action="AcceptRequest" method="post" class="me-2">
+                        <input type="hidden" name="friendshipId" value="@request.Id" />
+                        <button type="submit" class="btn btn-success">قبول</button>
+                    </form>
+                    <form asp-action="DeclineRequest" method="post">
+                        <input type="hidden" name="friendshipId" value="@request.Id" />
+                        <button type="submit" class="btn btn-danger">رفض</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>لا يوجد طلبات صداقة معلقة.</p>
+}

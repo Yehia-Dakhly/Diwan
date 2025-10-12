@@ -1,0 +1,97 @@
+﻿@model Diwan.PL.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Create New Account";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="auth-container">
+    <h2 class="auth-title">Create Your Account</h2>
+
+    <form asp-action="Register" enctype="multipart/form-data">
+        <div class="name-row">
+            <div class="">
+                <label for="FName">First Name</label>
+                <input asp-for="FName" placeholder="Enter your first name" />
+                <span asp-validation-for="FName" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label for="LName">Last Name</label>
+                <input asp-for="LName" placeholder="Enter your last name" />
+                <span asp-validation-for="LName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div>
+            <label for="Email">Email</label>
+            <input asp-for="Email" placeholder="Enter your email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label for="PhoneNumber">Phone Number</label>
+            <input asp-for="PhoneNumber" placeholder="Enter your phone" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label for="DateOfBirth">Date of Birth</label>
+            <input asp-for="DateOfBirth" type="date" />
+            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label for="Gender">Gender</label>
+            <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()">
+                <option value="">-- Select Gender --</option>
+            </select>
+            <span asp-validation-for="Gender" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label for="Password">Password</label>
+            <input asp-for="Password" type="password" placeholder="Enter password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label for="ComfirmPassword">Confirm Password</label>
+            <input asp-for="ComfirmPassword" type="password" placeholder="Re-enter password" />
+            <span asp-validation-for="ComfirmPassword" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label for="PictureImage">Profile Picture</label>
+            <input asp-for="PictureImage" />
+        </div>
+
+        <div>
+            <label for="CoverImage">Cover Image</label>
+            <input asp-for="CoverImage"/>
+        </div>
+
+        <div class="full-width">
+            <label for="Bio">Bio</label>
+            <textarea asp-for="Bio" placeholder="Write something about you..." rows="3"></textarea>
+        </div>
+
+        <div class="full-width agree-section">
+            <input asp-for="IsAgree" type="checkbox" />
+            <label for="IsAgree">I agree to the Terms and Conditions</label>
+        </div>
+
+        <button type="submit">Register</button>
+
+        <div class="text-center">
+            <p>Already have an account? <a asp-action="Login">Login here</a></p>
+        </div>
+    </form>
+</div>
+
+@section AuthSection {
+    <link rel="stylesheet" href="~/css/Register.css" />
+    <partial name="AuthSection" />
+}
+@section _ValidationScriptsPartial {
+    <partial name="_ValidationScriptsPartial" />
+}

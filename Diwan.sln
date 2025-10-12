@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diwan.PL", "Diwan.PL\Diwan.PL.csproj", "{C05176D3-8167-4E2E-ADCC-7DC044A2A244}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diwan.BLL", "Diwan.BLL\Diwan.BLL.csproj", "{FDF8C641-DBDF-4822-9F34-42F3BC6CADFD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diwan.DAL", "Diwan.DAL\Diwan.DAL.csproj", "{652C0CFD-7446-4674-A945-4C06A0C4D17B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C05176D3-8167-4E2E-ADCC-7DC044A2A244}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C05176D3-8167-4E2E-ADCC-7DC044A2A244}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C05176D3-8167-4E2E-ADCC-7DC044A2A244}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C05176D3-8167-4E2E-ADCC-7DC044A2A244}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDF8C641-DBDF-4822-9F34-42F3BC6CADFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDF8C641-DBDF-4822-9F34-42F3BC6CADFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDF8C641-DBDF-4822-9F34-42F3BC6CADFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDF8C641-DBDF-4822-9F34-42F3BC6CADFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{652C0CFD-7446-4674-A945-4C06A0C4D17B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{652C0CFD-7446-4674-A945-4C06A0C4D17B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{652C0CFD-7446-4674-A945-4C06A0C4D17B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{652C0CFD-7446-4674-A945-4C06A0C4D17B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4636A9A4-52C2-4148-B553-F45C6820C0FA}
+	EndGlobalSection
+EndGlobal
