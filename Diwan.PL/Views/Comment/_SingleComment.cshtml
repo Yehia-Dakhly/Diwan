@@ -1,0 +1,27 @@
+﻿@model CommentViewModel
+
+<div class="d-flex mt-3">
+    <img src="~/Files/Images/@Model?.AuthorPictureUrl" class="rounded-circle me-3" style="width:40px; height:40px;" />
+    <div class="flex-grow-1">
+        <div style="background-color: #e9ecef; border-radius: 15px; padding: 10px;">
+            <strong>@Model.AuthorName</strong>
+            <p class="mb-0">@Model.Content</p>
+        </div>
+        <div class="d-flex align-items-center mt-1">
+            <small class="text-muted ms-2">@Model.CreatedAt.ToShortDateString()</small>
+            <button class="btn btn-link btn-sm reply-button" data-commentid="@Model.Id" data-postid="@Model.PostId">Reply</button>
+            <a class="btn btn-link btn-sm" asp-action="Delete" asp-controller="Comment" asp-route-id="@Model.Id">Delete</a>
+        </div>
+        <div id="reply-form-container-@Model.Id" class="mt-2 reply-form-container" style="display:none;"></div>
+    </div>
+        @if (Model.Replies.Any())
+        {
+            <div class="replies-container ms-4 mt-2">
+                @foreach (var reply in Model.Replies.OrderBy(r => r.CreatedAt))
+                {
+                    <partial name="_SingleComment.cshtml" model="reply" />
+                }
+            </div>
+        }
+    </div>
+</div>

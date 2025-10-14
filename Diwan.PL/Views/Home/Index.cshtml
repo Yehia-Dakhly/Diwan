@@ -2,8 +2,11 @@
 @{
     ViewData["Title"] = "Index";
 }
-<a asp-action="CreatePost"  class="btn btn-success">Add New Post</a>
-
+<div class="mb-4">
+    <a asp-controller="Post" asp-action="Create" class="btn btn-success">
+        <i class="fas fa-plus"></i> أضف منشورًا جديدًا
+    </a>
+</div>
 <br />
 <br />
 @if (Model is not null && Model.Any())
@@ -11,38 +14,121 @@
     <div class="posts-container">
         @foreach (var post in Model)
         {
-            <div class="post-card">
-                <div class="post-header">
-                    <img src="~/Files/Images/@post.UserPictureURL" class="rounded height="40" width="40" alt="No Image">
-                    <div>
-                        <h3>@post.FullName</h3>
-                        <span class="post-date">@post?.CreatedAt.ToString("MMM dd, yyyy")</span>
-                    </div>
-                </div>
-
-                <div class="post-body">
-                    <p>@post?.Content</p>
-
-                    @if (!string.IsNullOrEmpty(post?.PictureURL))
-                    {
-                        <img src="~/Files/Posts/@post.PictureURL" class="rounded height="150" width="150" alt="No Image">
-                    }
-                </div>
-
-                <div class="post-footer">
-                    <span>@(post.CommentCount) 💬 Comments</span>
-                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Like).Count()) 👍🏻</span>
-                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Love).Count()) ❤️</span>
-                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Haha).Count()) 😂</span>
-                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Wow).Count()) 😮</span>
-                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Sad).Count()) 😭</span>
-                    <span>@(post.CountByType.Where(V => V.Key == ReactionType.Angry).Count()) 😡</span>
-                </div>
-            </div>
+            <partial name="PostPartialView" model="post" />
         }
     </div>
 }
 else
 {
     <h2 class="no-content">There's no content</h2>
+}
+
+@section Scripts {
+    <script>
+            // ########## ابدأ هنا ##########
+        $(document).ready(function () {
+            console.log("Page is ready. All scripts are now running.");
+
+            // ----- 1. منطق زر "كتابة تعليق" -----
+            $(document).on('click', '.comment-button', function () {
+                console.log("Comment button clicked!");
+                var postId = $(this).data('postid');
+                var container = $('#comment-form-container-' + postId);
+                var isVisible = container.is(':visible');
+
+                $('.comment-form-container').hide().html(''); // أغلق أي فورمات أخرى
+
+                if (!isVisible) {
+                    container.html('<div class="text-center p-3">Loading...</div>').show();
+                    $.get("/Comment/CreateComment?id=" + postId, function (data) {
+                        container.html(data);
+                    }).fail(function() {
+                        container.html('<p class="text-danger text-center">Failed to load form.</p>');
+                    });
+                }
+            });
+
+            // ----- 2. منطق زر "عرض التعليقات" -----
+            $(document).on('click', '.view-comments-button', function () {
+                console.log("View comments button clicked!");
+                var postId = $(this).data('postid');
+                var container = $('#comments-container-' + postId);
+
+                if (container.is(':visible')) {
+                    container.slideUp().html('');
+                } else {
+                    container.html('<div class="text-center p-3"><div class="spinner-border spinner-border-sm"></div></div>').slideDown();
+                    $.get("/Comment/_GetCommentsPartial?postId=" + postId, function (data) {
+                        container.html(data);
+                    }).fail(function() {
+                        container.html('<p class="text-danger text-center">Failed to load comments.</p>');
+                    });
+                }
+            });
+
+            // ----- 3. منطق زر "التفاعل" -----
+            $(document).on('click', '.reaction-icon', function (e) {
+                e.preventDefault();
+                console.log("Reaction icon clicked!");
+                var button = $(this);
+                var postId = button.data('postid');
+                var reactionTypeString = button.data('reactiontype');
+                var reactionTypeEnum = getReactionTypeEnum(reactionTypeString);
+
+                $.ajax({
+                    url: '/Post/ToggleReaction', // تأكد من أن هذا المسار صحيح
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ postId: postId, reactionType: reactionTypeEnum }),
+                    success: function (response) {
+                        console.log("Reaction success:", response);
+                        // هنا ستقوم بتحديث واجهة المستخدم بعد النجاح
+                    },
+                    error: function (xhr) {
+                        console.error("Reaction failed:", xhr.responseText);
+                    }
+                });
+            });
+
+            // دالة مساعدة لتحويل اسم التفاعل إلى رقم
+            function getReactionTypeEnum(reactionName) {
+                switch (reactionName) {
+                    case 'Like': return 1;
+                    case 'Love': return 2;
+                    case 'Haha': return 3;
+                    case 'Wow': return 4;
+                    case 'Sad': return 5;
+                    case 'Angry': return 6;
+                    default: return 0;
+                }
+            }
+
+        });
+        // ########## انتهي هنا ##########
+        $(document).ready(function () {
+            // ... (كود عرض التعليقات وكتابة تعليق) ...
+
+            // ⬇️⬇️⬇️ هذا هو الكود الجديد ⬇️⬇️⬇️
+            // --- منطق زر "الرد" ---
+            $(document).on('click', '.reply-button', function () {
+                var commentId = $(this).data('commentid');
+                var postId = $(this).data('postid');
+                var container = $('#reply-form-container-' + commentId);
+                var isVisible = container.is(':visible');
+
+                // قم بإخفاء كل فورمات الرد الأخرى المفتوحة
+                $('.reply-form-container').hide().html('');
+
+                if (!isVisible) {
+                    container.html('<div class="spinner-border spinner-border-sm"></div>').show();
+
+                    // استدعاء الـ Action لجلب فورم الرد
+                    $.get(`/Comment/ReplyComment?postId=${postId}&parentId=${commentId}`, function (data) {
+                        container.html(data);
+                    });
+                }
+            });
+            // ⬆️⬆️⬆️ نهاية الكود الجديد ⬆️⬆️⬆️
+        });
+    </script>
 }

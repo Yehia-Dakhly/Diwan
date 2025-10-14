@@ -5,6 +5,7 @@ using Diwan.DAL.Models;
 using Diwan.PL.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Diwan.PL.Controllers
 {
@@ -81,7 +82,7 @@ namespace Diwan.PL.Controllers
                 IsRead = false,
                 RecipientUserId = addresseeId,
                 NotificationType = DAL.Enums.NotificationType.NewFriendRequest,
-                URL = Url.Action("FriendRequests", "User")
+                URL = Url.Action("FriendRequests", "Friendship")
             };
             await _unitOfWork.NotificationRepository.AddAsync(NewNotification);
             await _unitOfWork.CompleteAsync();
@@ -101,18 +102,36 @@ namespace Diwan.PL.Controllers
         [HttpPost]
         public async Task<IActionResult> AcceptRequest(int friendshipId)
         {
-            var Friendship = await _unitOfWork.FriendshipRepository.FindFirstAsync(F => F.Id == friendshipId);
+            var CurrentUser = _userManager.GetUserId(User);
+            if (CurrentUser is null) {
+                return RedirectToAction("Index", "Home");
+            }
+            var Friendship = await _unitOfWork.FriendshipRepository.FindFirstAsync(F => F.Id == friendshipId, includes: [F => F.Addressee]);
             if (Friendship is not null)
             {
                 Friendship.Status = DAL.Enums.FriendRequestStatus.Accepted;
                 _unitOfWork.FriendshipRepository.Update(Friendship);
+                var NewNotification = new Notification()
+                {
+                    ActorUserId = CurrentUser,
+                    Message = $"{Friendship.Addressee.FirstName} {Friendship.Addressee.FirstName} Has Accecpted Your Friend Request!",
+                    IsRead = false,
+                    RecipientUserId = Friendship.RequesterId,
+                    NotificationType = DAL.Enums.NotificationType.FriendRequestAccepted,
+                    URL = Url.Action("Profile", "User", new { id = Friendship.AddresseeId })
+                };
+                await _unitOfWork.NotificationRepository.AddAsync(NewNotification);
                 await _unitOfWork.CompleteAsync();
             }
-
             return RedirectToAction(nameof(FriendRequests));
         }
         public async Task<IActionResult> DeclineRequest(int friendshipId)
         {
+            var CurrentUser = _userManager.GetUserId(User);
+            if (CurrentUser is null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             var Friendship = await _unitOfWork.FriendshipRepository.FindFirstAsync(F => F.Id == friendshipId);
             if (Friendship is not null)
             {
@@ -138,6 +157,39 @@ namespace Diwan.PL.Controllers
                 return View(Friends);
             }
                 return View();
+        }
+
+        public async Task<IActionResult> DeleteFriend([FromRoute] string id)
+        {
+            var CurrentUser = _userManager.GetUserId(User);
+            if (CurrentUser is null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var Friendship = await _unitOfWork.FriendshipRepository.FindFirstAsync(F => (F.AddresseeId == id && F.RequesterId == CurrentUser) || F.AddresseeId == CurrentUser && F.RequesterId == id);
+            if (Friendship is not null)
+            {
+                Friendship.Status = FriendRequestStatus.Unknown;
+                _unitOfWork.FriendshipRepository.Update(Friendship);
+                await _unitOfWork.CompleteAsync();
+            }
+            return RedirectToAction(nameof(Friends));
+        }
+        public async Task<IActionResult> BlockFriend([FromRoute] string id)
+        {
+            var CurrentUser = _userManager.GetUserId(User);
+            if (CurrentUser is null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var Friendship = await _unitOfWork.FriendshipRepository.FindFirstAsync(F => (F.AddresseeId == id && F.RequesterId == CurrentUser) || F.AddresseeId == CurrentUser && F.RequesterId == id);
+            if (Friendship is not null)
+            {
+                Friendship.Status = FriendRequestStatus.Blocked;
+                _unitOfWork.FriendshipRepository.Update(Friendship);
+                await _unitOfWork.CompleteAsync();
+            }
+            return RedirectToAction(nameof(Friends));
         }
     }
 }

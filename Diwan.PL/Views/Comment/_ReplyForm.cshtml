@@ -1,0 +1,11 @@
+﻿@model ReplyCommentViewModel
+
+<form asp-action="ReplyComment" asp-controller="Comment" method="post">
+    <input type="hidden" asp-for="PostId" />
+    <input type="hidden" asp-for="ParentId" />
+    <div class="mb-2">
+        <textarea asp-for="Content" class="form-control" rows="2" placeholder="اكتب ردك..." autofocus></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">نشر الرد</button>
+</form>

@@ -48,8 +48,8 @@
 </style>
 
 <div class="profile-header">
-    <img src="~/Files/Posts/@Model.CoverPicURL" alt="Cover Photo" class="cover-photo shadow-sm" />
-    <img src="~/Files/Posts/@Model.PictureURL" alt="Profile Picture" class="profile-picture" />
+    <img src="~/Files/Images/@Model.CoverPicURL" alt="Cover Photo" class="cover-photo shadow-sm" />
+    <img src="~/Files/Images/@Model.PictureURL" alt="Profile Picture" class="profile-picture" />
 </div>
 
 <div class="profile-info">
@@ -105,14 +105,15 @@
         {
             @foreach (var post in Model.Posts)
             {
-                <div class="post-card shadow-sm">
+                <partial name="PostPartialView" model="post" />
+                @* <div class="post-card shadow-sm">
                     <p>@post.Content</p>
                     @if (post.PictureURL != null)
                     {
                         <img src="~/Files/Posts/@post.PictureURL" class="img-fluid rounded mb-2" alt="Post Image" />
                     }
                     <small class="text-muted">نُشر بتاريخ: @post.CreatedAt.ToShortDateString()</small>
-                </div>
+                </div> *@
             }
         }
         else
@@ -121,3 +122,87 @@
         }
     </div>
 </div>
+@section Scripts {
+    <script>
+            // ########## ابدأ هنا ##########
+        $(document).ready(function () {
+            console.log("Page is ready. All scripts are now running.");
+
+            // ----- 1. منطق زر "كتابة تعليق" -----
+            $(document).on('click', '.comment-button', function () {
+                console.log("Comment button clicked!");
+                var postId = $(this).data('postid');
+                var container = $('#comment-form-container-' + postId);
+                var isVisible = container.is(':visible');
+
+                $('.comment-form-container').hide().html(''); // أغلق أي فورمات أخرى
+
+                if (!isVisible) {
+                    container.html('<div class="text-center p-3">Loading...</div>').show();
+                    $.get("/Comment/CreateComment?id=" + postId, function (data) {
+                        container.html(data);
+                    }).fail(function() {
+                        container.html('<p class="text-danger text-center">Failed to load form.</p>');
+                    });
+                }
+            });
+
+            // ----- 2. منطق زر "عرض التعليقات" -----
+            $(document).on('click', '.view-comments-button', function () {
+                console.log("View comments button clicked!");
+                var postId = $(this).data('postid');
+                var container = $('#comments-container-' + postId);
+
+                if (container.is(':visible')) {
+                    container.slideUp().html('');
+                } else {
+                    container.html('<div class="text-center p-3"><div class="spinner-border spinner-border-sm"></div></div>').slideDown();
+                    $.get("/Comment/_GetCommentsPartial?postId=" + postId, function (data) {
+                        container.html(data);
+                    }).fail(function() {
+                        container.html('<p class="text-danger text-center">Failed to load comments.</p>');
+                    });
+                }
+            });
+
+            // ----- 3. منطق زر "التفاعل" -----
+            $(document).on('click', '.reaction-icon', function (e) {
+                e.preventDefault();
+                console.log("Reaction icon clicked!");
+                var button = $(this);
+                var postId = button.data('postid');
+                var reactionTypeString = button.data('reactiontype');
+                var reactionTypeEnum = getReactionTypeEnum(reactionTypeString);
+
+                $.ajax({
+                    url: '/Post/ToggleReaction', // تأكد من أن هذا المسار صحيح
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ postId: postId, reactionType: reactionTypeEnum }),
+                    success: function (response) {
+                        console.log("Reaction success:", response);
+                        // هنا ستقوم بتحديث واجهة المستخدم بعد النجاح
+                    },
+                    error: function (xhr) {
+                        console.error("Reaction failed:", xhr.responseText);
+                    }
+                });
+            });
+
+            // دالة مساعدة لتحويل اسم التفاعل إلى رقم
+            function getReactionTypeEnum(reactionName) {
+                switch (reactionName) {
+                    case 'Like': return 1;
+                    case 'Love': return 2;
+                    case 'Haha': return 3;
+                    case 'Wow': return 4;
+                    case 'Sad': return 5;
+                    case 'Angry': return 6;
+                    default: return 0;
+                }
+            }
+
+        });
+        // ########## انتهي هنا ##########
+    </script>
+}

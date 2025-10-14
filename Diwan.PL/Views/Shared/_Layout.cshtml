@@ -12,11 +12,11 @@
 
     <style>
         body {
-            background-color: #F5F5F5; /* لون خلفية فاتح يشبه ورق البردي */
+            background-color: #F5F5F5;
         }
 
         .navbar-diwan {
-            background-color: #5D4037; /* لون بني غامق يشبه غلاف كتاب جلدي */
+            background-color: #5D4037;
         }
 
             .navbar-diwan .navbar-brand,
@@ -42,6 +42,182 @@
         .dropdown-menu {
             min-width: 350px; /* لجعل القائمة المنسدلة أعرض */
         }
+
+
+
+        /* حاوية التفاعل الرئيسية */
+        .react-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* القائمة المنبثقة للتفاعلات (مخفية بشكل افتراضي) */
+        .reaction-palette {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            padding: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            margin-bottom: 8px;
+            white-space: nowrap;
+            display: flex; /* اجعلها flex بشكل دائم */
+            gap: 8px;
+            /* ⬇️⬇️⬇️ الجزء الجديد والمهم ⬇️⬇️⬇️ */
+            opacity: 0; /* ابدأ شفافًا */
+            visibility: hidden; /* ابدأ مخفيًا */
+            transform: translateY(10px); /* ابدأ أسفل قليلاً */
+            transition: all 0.2s ease-in-out; /* أضف حركة ناعمة */
+        }
+
+        /* ⬇️⬇️⬇️ القاعدة الأهم ⬇️⬇️⬇️ */
+        /* عند مرور الماوس فوق الحاوية، قم بإظهار القائمة */
+        .react-container:hover .reaction-palette {
+            opacity: 1; /* اجعله ظاهرًا */
+            visibility: visible; /* اجعله مرئيًا */
+            transform: translateY(0); /* ارجعه لمكانه الطبيعي */
+        }
+
+        /* تصميم أيقونة التفاعل */
+        .reaction-icon {
+            border: none;
+            background: none;
+            font-size: 1.8rem;
+            padding: 0;
+            cursor: pointer;
+            transition: transform 0.15s ease-in-out;
+        }
+
+            /* تأثير عند مرور الماوس فوق الأيقونة */
+            .reaction-icon:hover {
+                transform: scale(1.3);
+            }
+
+
+
+
+
+
+        /* ===== تحسين شكل قائمة المنشورات ===== */
+        .posts-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            margin: 30px auto;
+            max-width: 650px; /* جعلها في منتصف الصفحة بعرض مناسب */
+        }
+
+        /* ===== تصميم كرت المنشور ===== */
+        .post-card {
+            background: #ffffff;
+            width: 100%;
+            border-radius: 18px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            padding: 20px 25px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .post-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            }
+
+        /* ===== رأس المنشور ===== */
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+            .post-header img {
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                object-fit: cover;
+                border: 2px solid #ddd;
+            }
+
+            .post-header h3 {
+                font-size: 1.1rem;
+                margin: 0;
+                color: #3E2723;
+            }
+
+        .post-date {
+            font-size: 0.85rem;
+            color: #8D6E63;
+        }
+
+        /* ===== محتوى المنشور ===== */
+        .post-body p {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+        }
+
+        .post-body img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        /* ===== التفاعلات والتعليقات ===== */
+        .post-footer {
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+            padding-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .reaction-summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .reaction-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        /* ===== أزرار التفاعل والتعليق ===== */
+        .react-container .btn,
+        .comment-button,
+        .view-comments-button {
+            font-size: 0.9rem;
+            border-radius: 25px;
+            padding: 6px 14px;
+            transition: background 0.2s;
+        }
+
+            .react-container .btn:hover,
+            .comment-button:hover,
+            .view-comments-button:hover {
+                background-color: #f1f1f1;
+            }
+
+        /* ===== النص في حالة عدم وجود منشورات ===== */
+        .no-content {
+            text-align: center;
+            margin-top: 50px;
+            color: #6d4c41;
+        }
+
     </style>
 </head>
 <body>
@@ -61,7 +237,7 @@
                             <a class="nav-link" asp-controller="Home" asp-action="Index">الرئيسية</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Profile" asp-action="Index">ملفي الشخصي</a>
+                            <a class="nav-link" asp-controller="User" asp-action="Profile">ملفي الشخصي</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Friendship" asp-action="Friends">أصدقائي</a>
@@ -108,29 +284,34 @@
     <footer class="border-top footer-diwan text-center">
         <div class="container">
             &copy; 2025 - ديوان: مجتمع الشعر والأدب
+            <br />
+            Created And Developed By <strong>Yehia Mohamed Dakhly</strong>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     @if (User.Identity is { IsAuthenticated: true })
     {
         <script>
             $(document).ready(function () {
+                var isLoaded = false; // متغير لتتبع ما إذا كانت الإشعارات قد تم تحميلها
+
                 // عندما يتم الضغط على أيقونة الجرس
                 $('#notificationDropdown').on('click', function () {
-                    // قبل إرسال الطلب، أظهر أيقونة التحميل
-                    $("#notificationMenu").html('<li class="text-center p-2"><div class="spinner-border spinner-border-sm" role="status"></div></li>');
-
-                    // أرسل طلب GET إلى الـ Action الخاص بالإشعارات
-                    $.get("/Notifications/GetNotificationsPartial", function (data) {
-                        // ضع الـ HTML الذي تم إرجاعه من الـ Action داخل القائمة المنسدلة
-                        $("#notificationMenu").html(data);
-                    });
+                    // قم بالتحميل فقط إذا لم يتم تحميلها من قبل
+                    if (!isLoaded) {
+                        // أرسل طلب GET إلى الـ Action الخاص بالإشعارات
+                        $.get("/User/Notification", function (data) {
+                            // ضع الـ HTML الذي تم إرجاعه داخل القائمة المنسدلة
+                            $("#notificationMenu").html(data);
+                            isLoaded = true; // ضع علامة بأنها تم تحميلها
+                        });
+                    }
                 });
             });
+           
         </script>
     }
     @await RenderSectionAsync("Scripts", required: false)

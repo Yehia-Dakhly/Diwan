@@ -23,10 +23,19 @@ namespace Diwan.PL.Controllers
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<IActionResult> Profile(string id)
+        public async Task<IActionResult> Profile([FromRoute] string id)
         {
+            
             var CurrentUser = _userManager.GetUserId(User);
-            var UserProfile = await _unitOfWork.UserRepository.FindFirstAsync(U => U.Id == id, includes: [U => U.Posts]);
+            if (CurrentUser is null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            if (id is null)
+            {
+                id = CurrentUser;
+            }
+            var UserProfile = await _unitOfWork.UserRepository.FindFirstAsync(U => U.Id == id, includes: [U => U.Posts, U => U.Reactions, User => User.Comments]);
             if (UserProfile is not null)
             {
                 var Posts = UserProfile.Posts.ToList();
@@ -56,13 +65,23 @@ namespace Diwan.PL.Controllers
 
                     IsFriendshipInitiator = Friendship is not null && Friendship.RequesterId == _userManager.GetUserId(User),
                     FriendshipStatus = FriendStatus,
-                    IsCurrentUserProfile = id == _userManager.GetUserId(User),
+                    IsCurrentUserProfile = (id == _userManager.GetUserId(User)),
                     Posts = MappedPosts
                 };
                 return View(MappedProfile);
             }
             return RedirectToAction("Index", "Home");
         }
-        
+        public async Task<IActionResult> Notification()
+        {
+            var CurrentUser = _userManager.GetUserId(User);
+            if (CurrentUser is null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var Notifications = (await _unitOfWork.NotificationRepository.FindAsync(N => N.RecipientUserId == CurrentUser, includes: [N => N.ActorUser])).ToList();
+            var MappedNotifications = _mapper.Map<IEnumerable<NotificationViewModel>>(Notifications);
+            return PartialView("~/Views/Notification/PartialView/_NotificationList.cshtml", MappedNotifications);
+        }
     }
 }

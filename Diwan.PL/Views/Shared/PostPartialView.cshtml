@@ -1,0 +1,104 @@
+﻿@model PostViewModel
+<div class="post-card">
+    <div class="post-header">
+        <img src="~/Files/Images/@Model.UserPictureURL" alt="User Image">
+        <div>
+            <h3>@Model.FullName</h3>
+            <span class="post-date">@Model?.CreatedAt.ToString("MMM dd, yyyy")</span>
+        </div>
+    </div>
+
+    <div class="post-body">
+        <p>@Model?.Content</p>
+
+        @if (!string.IsNullOrEmpty(Model?.PictureURL))
+        {
+            <img src="~/Files/Posts/@Model.PictureURL" class="rounded height="150" width="150" alt="No Image">
+        }
+    </div>
+    <div class="card-footer post-footer">
+        <div class="reaction-summary">
+            @{
+                // جلب عدد كل تفاعل وتخزينه في متغير لسهولة الاستخدام
+                var likes = Model.CountByType.GetValueOrDefault(ReactionType.Like);
+                var loves = Model.CountByType.GetValueOrDefault(ReactionType.Love);
+                var hahas = Model.CountByType.GetValueOrDefault(ReactionType.Haha);
+                var wows = Model.CountByType.GetValueOrDefault(ReactionType.Wow);
+                var sads = Model.CountByType.GetValueOrDefault(ReactionType.Sad);
+                var angries = Model.CountByType.GetValueOrDefault(ReactionType.Angry);
+            }
+
+            @if (likes > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-thumbs-up text-primary"></i>
+                    <span>@likes</span>
+                </div>
+            }
+            @if (loves > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-heart text-danger"></i>
+                    <span>@loves</span>
+                </div>
+            }
+            @if (hahas > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-laugh-squint text-warning"></i>
+                    <span>@hahas</span>
+                </div>
+            }
+            @if (wows > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-surprise text-info"></i>
+                    <span>@wows</span>
+                </div>
+            }
+            @if (sads > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-sad-tear text-info"></i>
+                    <span>@sads</span>
+                </div>
+            }
+            @if (angries > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-angry text-danger"></i>
+                    <span>@angries</span>
+                </div>
+            }
+        </div>
+
+
+        <div class="react-container">
+            <button class="btn btn-light react-button">
+                <i class="far fa-thumbs-up"></i> تفاعل
+            </button>
+
+            <div class="reaction-palette">
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Like"><i class="fas fa-thumbs-up text-primary"></i></button>
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Love"><i class="fas fa-heart text-danger"></i></button>
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Haha"><i class="fas fa-laugh-squint text-warning"></i></button>
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Wow"><i class="fas fa-surprise text-info"></i></button>
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Sad"><i class="fas fa-sad-tear text-info"></i></button>
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Angry"><i class="fas fa-angry text-danger"></i></button>
+            </div>
+        </div>
+
+
+        <button class="btn btn-light comment-button" data-postid="@Model.Id">
+            <i class="fas fa-comment"></i> تعليق
+        </button>
+
+        <button class="btn btn-light view-comments-button" data-postid="@Model.Id">
+            <i class="far fa-comments"></i> عرض التعليقات (@Model.CommentCount)
+        </button>
+
+        <div id="comments-container-@Model.Id" class="mt-3"></div>
+        <div id="comment-form-container-@Model.Id" class="mt-3" style="display:none;">
+        </div>
+    </div>
+</div>

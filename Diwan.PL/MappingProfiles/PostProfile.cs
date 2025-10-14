@@ -18,6 +18,8 @@ namespace Diwan.PL.MappingProfiles
                         .GroupBy(P => P.ReactionType).ToDictionary(G => G.Key, G => G.Count())))
                 .ReverseMap();
 
+            CreateMap<CreatePostViewModel, Post>();
+
         }
     }
 }

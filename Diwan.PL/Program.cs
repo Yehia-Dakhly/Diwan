@@ -30,7 +30,7 @@ namespace Diwan.PL
             builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddAutoMapper(M => M.AddProfiles(new List<Profile>() { new PostProfile(), new UserProfile(), new FriendshipProfile() }));
+            builder.Services.AddAutoMapper(M => M.AddProfiles(new List<Profile>() { new PostProfile(), new UserProfile(), new FriendshipProfile(), new NotificationProfile(), new CommentProfile()}));
             builder.Services.AddIdentity<DiwanUser, IdentityRole>(Options =>
             {
                 Options.Password.RequireNonAlphanumeric = true; // @#

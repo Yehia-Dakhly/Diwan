@@ -1,0 +1,24 @@
+﻿@model IEnumerable<NotificationViewModel>
+
+@if (Model != null && Model.Any())
+{
+    @foreach (var notification in Model)
+    {
+        <li>
+            <a class="dropdown-item d-flex align-items-center p-2" href="@notification.URL">
+                <img src="~/Files/Images/@notification.PictureURL" class="rounded-circle me-2" style="width:40px; height:40px; object-fit: cover;" />
+                <div>
+                    <small style="font-weight: 500;">@notification.Message</small><br />
+                    <small class="text-muted">@notification.CreatedAt.ToShortTimeString()</small>
+                </div>
+            </a>
+        </li>
+    }
+}
+else
+{
+    <li><span class="dropdown-item text-muted text-center p-3">لا توجد إشعارات جديدة</span></li>
+}
+
+<li><hr class="dropdown-divider"></li>
+<li><a class="dropdown-item text-center" href="#">عرض كل الإشعارات</a></li>

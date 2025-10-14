@@ -1,0 +1,10 @@
+﻿@model CommentCreateViewModel
+
+<form asp-action="CreateComment" asp-controller="Comment">
+    <input hidden asp-for="PostId" />
+    <div class="mb-2">
+        <textarea asp-for="Content" class="form-control" rows="3" placeholder="اكتب تعليقك..."></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">نشر التعليق</button>
+</form>

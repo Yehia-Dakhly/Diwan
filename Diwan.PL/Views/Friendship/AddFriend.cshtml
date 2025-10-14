@@ -32,7 +32,7 @@
                     </div>
 
                     <div>
-                        @if (user.FriendshipStatus == null || user.FriendshipStatus == FriendRequestStatus.Declined)
+                        @if (user.FriendshipStatus == null|| user.FriendshipStatus == FriendRequestStatus.Unknown || user.FriendshipStatus == FriendRequestStatus.Declined)
                         {
                             <form asp-action="RequestFriend" method="post">
                                 <input type="hidden" name="addresseeId" value="@user.Id" />
@@ -54,6 +54,10 @@
                         else if (user.FriendshipStatus == FriendRequestStatus.Accepted)
                         {
                             <span class="badge bg-primary p-2">Friends</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger p-2">Blocked</span>
                         }
                     </div>
                 </div>
