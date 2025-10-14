@@ -9,6 +9,7 @@ namespace Diwan.PL.MappingProfiles
         public UserProfile()
         {
             CreateMap<DiwanUser, DiwanUserViewModel>().ReverseMap();
+            CreateMap<DiwanUser, EditProfileViewModel>().ReverseMap();
         }
     }
 }

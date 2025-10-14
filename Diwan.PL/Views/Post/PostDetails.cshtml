@@ -1,28 +1,20 @@
-﻿@model IEnumerable<PostViewModel>
+﻿@model PostViewModel
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "PostDetails";
 }
-<div class="mb-4">
-    <a asp-controller="Post" asp-action="CreatePost" class="btn btn-success">
-        <i class="fas fa-plus"></i> أضف منشورًا جديدًا
-    </a>
-</div>
-<br />
-<br />
-@if (Model is not null && Model.Any())
+
+<h1>PostDetails</h1>
+
+@if (Model is not null)
 {
     <div class="posts-container">
-        @foreach (var post in Model)
-        {
-            <partial name="PostPartialView" model="post" />
-        }
+        <partial name="PostPartialView" model="Model" />
     </div>
 }
 else
 {
     <h2 class="no-content">There's no content</h2>
 }
-
 @section Scripts {
     <script>
             // ########## ابدأ هنا ##########

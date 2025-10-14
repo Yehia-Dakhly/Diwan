@@ -60,7 +60,7 @@
 <div class="profile-actions">
     @if (Model.IsCurrentUserProfile)
     {
-        <a asp-action="Edit" asp-controller="Profile" class="btn btn-outline-secondary">تعديل الملف الشخصي</a>
+        <a asp-action="EditProfile" asp-route-id="@Model.Id" asp-controller="User" class="btn btn-outline-secondary">تعديل الملف الشخصي</a>
     }
     else
     {
@@ -106,14 +106,6 @@
             @foreach (var post in Model.Posts)
             {
                 <partial name="PostPartialView" model="post" />
-                @* <div class="post-card shadow-sm">
-                    <p>@post.Content</p>
-                    @if (post.PictureURL != null)
-                    {
-                        <img src="~/Files/Posts/@post.PictureURL" class="img-fluid rounded mb-2" alt="Post Image" />
-                    }
-                    <small class="text-muted">نُشر بتاريخ: @post.CreatedAt.ToShortDateString()</small>
-                </div> *@
             }
         }
         else

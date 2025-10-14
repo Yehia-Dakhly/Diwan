@@ -4,6 +4,7 @@ using Diwan.DAL.Models;
 using Diwan.PL.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Diwan.PL.Controllers
 {
@@ -42,7 +43,16 @@ namespace Diwan.PL.Controllers
             }
             return View(Post);
         }
-
+        public async Task<IActionResult> PostDetails(int id)
+        {
+            var Post = await _unitOfWork.PostRepository.FindFirstAsync(P =>  P.Id == id, includes: [P => P.Comments, P => P.Reactions, P => P.Author]);
+            if (Post is not null)
+            {
+                var MapppedPost = _mapper.Map<PostViewModel>(Post);
+                return View(MapppedPost);
+            }
+            return NotFound();
+        }
 
         public async Task<IActionResult> ToggleReaction([FromBody] ReationViewModel model)
         {
@@ -60,6 +70,7 @@ namespace Diwan.PL.Controllers
             // Case 1: A reaction already exists
             if (existingReaction != null)
             {
+                //var Notification = _unitOfWork.NotificationRepository.FindFirstAsync(N => N.);
                 // If the user clicked the SAME reaction again, they are "un-reacting"
                 if (existingReaction.ReactionType == model.ReactionType)
                 {

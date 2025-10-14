@@ -1,5 +1,7 @@
-﻿@model CommentViewModel
-
+﻿@using Diwan.DAL.Models
+@using Microsoft.AspNetCore.Identity
+@model CommentViewModel
+@inject UserManager<DiwanUser> _userManager
 <div class="d-flex mt-3">
     <img src="~/Files/Images/@Model?.AuthorPictureUrl" class="rounded-circle me-3" style="width:40px; height:40px;" />
     <div class="flex-grow-1">
@@ -10,7 +12,11 @@
         <div class="d-flex align-items-center mt-1">
             <small class="text-muted ms-2">@Model.CreatedAt.ToShortDateString()</small>
             <button class="btn btn-link btn-sm reply-button" data-commentid="@Model.Id" data-postid="@Model.PostId">Reply</button>
-            <a class="btn btn-link btn-sm" asp-action="Delete" asp-controller="Comment" asp-route-id="@Model.Id">Delete</a>
+            
+            @if (_userManager.GetUserId(User) == Model.AuthorId)
+            {
+                <a class="btn btn-link btn-sm" asp-action="Delete" asp-con}troller="Comment" asp-route-id="@Model.Id">Delete</a>
+            }
         </div>
         <div id="reply-form-container-@Model.Id" class="mt-2 reply-form-container" style="display:none;"></div>
     </div>

@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
 using Diwan.BLL.Interfaces;
-using Diwan.BLL.Repositories;
 using Diwan.DAL.Models;
 using Diwan.PL.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Numerics;
-using System.Threading.Tasks;
 
 namespace Diwan.PL.Controllers
 {
@@ -30,7 +27,7 @@ namespace Diwan.PL.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateComment(CommentCreateViewModel model)
         {
-            var CurrentUser = _userManager.GetUserId(User);
+            var CurrentUser = await _userManager.GetUserAsync(User);
             if (CurrentUser is null)
             {
                 return RedirectToAction("Login", "Account");
@@ -38,9 +35,23 @@ namespace Diwan.PL.Controllers
             var Comment = new Comment()
             {
                 Content = model.Content,
-                UserId = CurrentUser,
+                UserId = CurrentUser.Id,
                 PostId = model.PostId,
             };
+            var Post = await _unitOfWork.PostRepository.FindFirstAsync(P => P.Id == model.PostId);
+            if (Post.AuthorId != CurrentUser.Id)
+            {
+                var NewNotification = new Notification()
+                {
+                    ActorUserId = CurrentUser.Id,
+                    Message = $"{CurrentUser.FirstName} {CurrentUser.LastName} Has Commented On Your Post!",
+                    IsRead = false,
+                    RecipientUserId = Post.AuthorId,
+                    NotificationType = DAL.Enums.NotificationType.NewPostComment,
+                    URL = Url.Action("PostDetails", "Post", new { id = model.PostId })
+                };
+                await _unitOfWork.NotificationRepository.AddAsync(NewNotification);
+            }
             await _unitOfWork.CommentRepository.AddAsync(Comment);
             await _unitOfWork.CompleteAsync();
             return RedirectToAction("Index", "Home");
@@ -96,38 +107,71 @@ namespace Diwan.PL.Controllers
         {
             if (ModelState.IsValid)
             {
+                var CurrentUser = await _userManager.GetUserAsync(User);
                 var reply = new Comment
                 {
                     Content = model.Content,
                     PostId = model.PostId,
                     ParentId = model.ParentId,
-                    UserId = _userManager.GetUserId(User)
+                    UserId = CurrentUser.Id,
                 };
-
+                var Parent = await _unitOfWork.PostRepository.FindFirstAsync(P => P.Id == model.PostId, includes: [P => P.Comments]);
+                var ParentCommentUserId = Parent.Comments.FirstOrDefault(C => C.Id == model.ParentId);
+                if (ParentCommentUserId is not null && ParentCommentUserId.UserId != CurrentUser.Id)
+                {
+                    var NewNotification = new Notification()
+                    {
+                        ActorUserId = CurrentUser.Id,
+                        Message = $"{CurrentUser.FirstName} {CurrentUser.LastName} Replied To Your Comment!",
+                        IsRead = false,
+                        RecipientUserId = ParentCommentUserId.UserId,
+                        NotificationType = DAL.Enums.NotificationType.NewCommentReply,
+                        URL = Url.Action("PostDetails", "Post", new { id = model.PostId })
+                    };
+                    await _unitOfWork.NotificationRepository.AddAsync(NewNotification);
+                }
+                
+                if (Parent.AuthorId != CurrentUser.Id)
+                {
+                    var PostUserNotification = new Notification()
+                    {
+                        ActorUserId = CurrentUser.Id,
+                        Message = $"{CurrentUser.FirstName} {CurrentUser.LastName} Commented On Your Post!",
+                        IsRead = false,
+                        RecipientUserId = Parent.AuthorId,
+                        NotificationType = DAL.Enums.NotificationType.NewPostComment,
+                        URL = Url.Action("PostDetails", "Post", new { id = model.PostId })
+                    };
+                    await _unitOfWork.NotificationRepository.AddAsync(PostUserNotification);
+                }
                 await _unitOfWork.CommentRepository.AddAsync(reply);
                 await _unitOfWork.CompleteAsync();
-
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("PostDetails", "Post", new { id = Parent.Id });
             }
             return BadRequest("Invalid reply data.");
         }
         public async Task<IActionResult> Delete(int id)
         {
-            int Temp = id;
-            List<Comment> V = new List<Comment>();
-            V.Add(await _unitOfWork.CommentRepository.FindFirstAsync(F => F.Id == id));
-            var New = await _unitOfWork.CommentRepository.FindFirstAsync(C => C.ParentId == Temp);
-            while (New != null)
+            var UserId = _userManager.GetUserId(User);
+
+            if (_unitOfWork.CommentRepository.FindFirstAsync(C => C.UserId == UserId) != null)
             {
-                V.Add(New);
-                Temp = New.Id;
-                New = await _unitOfWork.CommentRepository.FindFirstAsync(C => C.ParentId == Temp);
+                int Temp = id;
+                List<Comment> V = new List<Comment>();
+                V.Add(await _unitOfWork.CommentRepository.FindFirstAsync(F => F.Id == id));
+                var New = await _unitOfWork.CommentRepository.FindFirstAsync(C => C.ParentId == Temp);
+                while (New != null)
+                {
+                    V.Add(New);
+                    Temp = New.Id;
+                    New = await _unitOfWork.CommentRepository.FindFirstAsync(C => C.ParentId == Temp);
+                }
+                for (int i = V.Count - 1; i >= 0; i--)
+                {
+                    _unitOfWork.CommentRepository.Delete(V[i]);
+                }
+                await _unitOfWork.CompleteAsync();
             }
-            for (int i = V.Count - 1; i >= 0; i--)
-            {
-                _unitOfWork.CommentRepository.Delete(V[i]);
-            }
-            await _unitOfWork.CompleteAsync();
             return RedirectToAction("Index", "Home");
         }
     }

@@ -1,12 +1,14 @@
 ﻿@model PostViewModel
 <div class="post-card">
+    <a asp-action="Profile" asp-controller="User" asp-route-id="@Model.AuthorId">
     <div class="post-header">
         <img src="~/Files/Images/@Model.UserPictureURL" alt="User Image">
         <div>
             <h3>@Model.FullName</h3>
             <span class="post-date">@Model?.CreatedAt.ToString("MMM dd, yyyy")</span>
         </div>
-    </div>
+        </div>
+    </a>
 
     <div class="post-body">
         <p>@Model?.Content</p>

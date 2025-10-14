@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using Diwan.BLL.Interfaces;
 using Diwan.DAL.Enums;
 using Diwan.DAL.Models;
 using Diwan.PL.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Policy;
-using System.Threading.Tasks;
 
 namespace Diwan.PL.Controllers
 {
@@ -25,7 +22,7 @@ namespace Diwan.PL.Controllers
         }
         public async Task<IActionResult> Profile([FromRoute] string id)
         {
-            
+
             var CurrentUser = _userManager.GetUserId(User);
             if (CurrentUser is null)
             {
@@ -40,7 +37,7 @@ namespace Diwan.PL.Controllers
             {
                 var Posts = UserProfile.Posts.ToList();
                 var MappedPosts = new List<PostViewModel>();
-                    
+
                 if (Posts is not null)
                 {
                     MappedPosts = _mapper.Map<IEnumerable<Post>, IEnumerable<PostViewModel>>(Posts).ToList();
@@ -71,6 +68,43 @@ namespace Diwan.PL.Controllers
                 return View(MappedProfile);
             }
             return RedirectToAction("Index", "Home");
+        }
+        public async Task<IActionResult> EditProfile([FromRoute] string id)
+        {
+            var CurrentUser = _userManager.GetUserId(User);
+            if (CurrentUser != id)
+            {
+                return BadRequest();
+            }
+            var UserProfile = await _unitOfWork.UserRepository.FindFirstAsync(U => U.Id == id);
+            if (UserProfile is not null)
+            {
+                var MappedProfile = _mapper.Map<EditProfileViewModel>(UserProfile);
+                return View(MappedProfile);
+            }
+            return BadRequest();
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditProfile(EditProfileViewModel model)
+        {
+            var CurrentUser = _userManager.GetUserId(User);
+            if (CurrentUser != model.Id)
+            {
+                return BadRequest();
+            }
+            var UserProfile = await _unitOfWork.UserRepository.FindFirstAsync(U => U.Id == model.Id);
+            if (UserProfile is not null)
+            {
+                if (model.Picture != null)
+                    UserProfile.PictureURL = Helpers.DocumentSettings.UploadFile(model.Picture, "Images");
+                if (model.CoverPic != null)
+                    UserProfile.CoverPicURL = Helpers.DocumentSettings.UploadFile(model.CoverPic, "Images");
+                _mapper.Map(model, UserProfile);
+                _unitOfWork.UserRepository.Update(UserProfile);
+                await _unitOfWork.CompleteAsync();
+                return RedirectToAction("Profile", "User", new { id = model.Id });
+            }
+            return BadRequest();
         }
         public async Task<IActionResult> Notification()
         {

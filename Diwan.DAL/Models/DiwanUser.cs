@@ -22,8 +22,8 @@ namespace Diwan.DAL.Models
         public Gender? Gender { get; set; }
         public string? PictureURL { get; set; }
         public string? CoverPicURL { get; set; }
-        public DateTime CreatedAt { get; set; }
         public string? Bio { get; set; }
+        public DateTime CreatedAt { get; set; }
         public bool IsAgree { get; set; }
         public ICollection<Post> Posts { get; set; } = new HashSet<Post>();
         public ICollection<Notification> ReceivedNotifications { get; set; } = new HashSet<Notification>();
