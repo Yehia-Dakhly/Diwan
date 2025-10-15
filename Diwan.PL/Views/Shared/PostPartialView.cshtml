@@ -1,12 +1,36 @@
 ﻿@model PostViewModel
 <div class="post-card">
     <a asp-action="Profile" asp-controller="User" asp-route-id="@Model.AuthorId">
-    <div class="post-header">
-        <img src="~/Files/Images/@Model.UserPictureURL" alt="User Image">
-        <div>
-            <h3>@Model.FullName</h3>
-            <span class="post-date">@Model?.CreatedAt.ToString("MMM dd, yyyy")</span>
-        </div>
+        <div class="post-header">
+            <img src="~/Files/Images/@Model.UserPictureURL" alt="User Image">
+            <div>
+                <h3>@Model.FullName</h3>
+                @if(Model.UpdatedAt is null)
+                {
+                    <span class="post-date">@Model?.CreatedAt.ToString("MMM dd, yyyy")</span>
+                }
+                else
+                {
+                    <span class="post-date">@Model?.UpdatedAt?.ToString("MMM dd, yyyy")</span>
+                }
+                @{
+                    var visibilityLabel = Model.Visibility switch
+                    {
+                        Visibility.Public => "عام",
+                        Visibility.Friends => "الأصدقاء فقط",
+                        Visibility.Private => "خاص",
+                        _ => "غير معروف"
+                    };
+                    var visibilityIcon = Model.Visibility switch
+                    {
+                        Visibility.Public => "fas fa-globe",
+                        Visibility.Friends => "fas fa-user-friends",
+                        Visibility.Private => "fas fa-lock",
+                        _ => "fas fa-question-circle"
+                    };
+                }
+                <i class="@visibilityIcon ms-1"></i> @visibilityLabel
+            </div>
         </div>
 
     </a>

@@ -2,11 +2,13 @@
 using Diwan.BLL.Interfaces;
 using Diwan.DAL.Models;
 using Diwan.PL.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Diwan.PL.Controllers
 {
+    [Authorize]
     public class CommentController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -54,7 +56,7 @@ namespace Diwan.PL.Controllers
             }
             await _unitOfWork.CommentRepository.AddAsync(Comment);
             await _unitOfWork.CompleteAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("PostDetails", "Post", new { id = model.PostId });
         }
         public async Task<IActionResult> _GetCommentsPartial(int postId)
         {
@@ -67,25 +69,21 @@ namespace Diwan.PL.Controllers
 
                 var allCommentViewModels = _mapper.Map<IEnumerable<CommentViewModel>>(AllComments);
 
-                // 3. تجميع الردود تحت التعليقات الأصلية (الأهم)
                 var commentLookup = allCommentViewModels.ToDictionary(c => c.Id);
                 var topLevelComments = new List<CommentViewModel>();
 
                 foreach (var comment in allCommentViewModels)
                 {
-                    // إذا كان للتعليق أب، أضفه إلى قائمة الردود الخاصة بالأب
                     if (comment.ParentId != null && commentLookup.ContainsKey(comment.ParentId.Value))
                     {
                         commentLookup[comment.ParentId.Value].Replies.Add(comment);
                     }
-                    // إذا لم يكن له أب، فهو تعليق أساسي
                     else
                     {
                         topLevelComments.Add(comment);
                     }
                 }
 
-                // رتب التعليقات والردود حسب التاريخ
                 var sortedComments = topLevelComments.OrderBy(c => c.CreatedAt).ToList();
 
                 return PartialView("_CommentList", sortedComments);

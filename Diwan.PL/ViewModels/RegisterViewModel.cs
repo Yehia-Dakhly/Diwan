@@ -20,6 +20,8 @@ namespace Diwan.PL.ViewModels
         public string PhoneNumber { get; set; }
         [Required(ErrorMessage = "Password is Required")]
         [DataType(DataType.Password)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$",
+        ErrorMessage = "كلمة المرور يجب أن تحتوي على حرف كبير، حرف صغير، رقم، رمز وطول لا يقل عن 8 أحرف.")]
         public string Password { get; set; }
         [Required(ErrorMessage = "Comfirm Password is Required")]
         [DataType(DataType.Password)]

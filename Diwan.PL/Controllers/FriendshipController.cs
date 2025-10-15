@@ -3,12 +3,14 @@ using Diwan.BLL.Interfaces;
 using Diwan.DAL.Enums;
 using Diwan.DAL.Models;
 using Diwan.PL.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace Diwan.PL.Controllers
 {
+    [Authorize]
     public class FriendshipController : Controller
     {
         private readonly UserManager<DiwanUser> _userManager;
@@ -86,7 +88,7 @@ namespace Diwan.PL.Controllers
             };
             await _unitOfWork.NotificationRepository.AddAsync(NewNotification);
             await _unitOfWork.CompleteAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Profile", "User", new {id = addresseeId});
         }
         public async Task<IActionResult> FriendRequests()
         {

@@ -9,6 +9,6 @@ namespace Diwan.BLL.Interfaces
 {
     public interface IFriendshipRepository : IGenericRepository<Friendship>
     {
-
+        Task<IEnumerable<string>> GetFirendsIDsAsync(string id);
     }
 }

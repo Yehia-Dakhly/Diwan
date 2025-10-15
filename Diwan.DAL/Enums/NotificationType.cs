@@ -13,6 +13,7 @@ namespace Diwan.DAL.Enums
         FriendRequestAccepted = 2,
         NewPostReaction = 3,
         NewPostComment = 4,
-        NewCommentReply = 5
+        NewCommentReply = 5,
+        NewSharedPost = 6
     }
 }

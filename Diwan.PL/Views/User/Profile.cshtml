@@ -64,9 +64,9 @@
     }
     else
     {
-        @if (Model.FriendshipStatus == null)
+        @if (Model.FriendshipStatus == null || Model.FriendshipStatus == FriendRequestStatus.Declined || Model.FriendshipStatus == FriendRequestStatus.Unknown)
         {
-            <form asp-action="RequestFriend" asp-controller="Friendships" method="post">
+            <form asp-action="RequestFriend" asp-controller="Friendship" method="post">
                 <input type="hidden" name="addresseeId" value="@Model.Id" />
                 <button type="submit" class="btn btn-success"><i class="fas fa-user-plus"></i> إضافة صديق</button>
             </form>
@@ -88,10 +88,7 @@
         }
         else
         {
-            <form asp-action="RequestFriend" asp-controller="Friendships" method="post">
-                <input type="hidden" name="addresseeId" value="@Model.Id" />
-                <button type="submit" class="btn btn-success"><i class="fas fa-user-plus"></i> إضافة صديق</button>
-            </form>
+            <button class="btn btn-danger" disabled><i class="fas alert-danger"></i> محظور</button>
         }
     }
 </div>

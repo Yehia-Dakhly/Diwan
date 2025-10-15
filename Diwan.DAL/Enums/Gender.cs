@@ -8,7 +8,7 @@ namespace Diwan.DAL.Enums
 {
     public enum Gender
     {
-        Unknown = 0,
+        PreferNotToSay = 0,
         Male = 1,
         Female = 2,
     }

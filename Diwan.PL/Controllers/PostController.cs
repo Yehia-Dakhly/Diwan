@@ -2,12 +2,13 @@
 using Diwan.BLL.Interfaces;
 using Diwan.DAL.Models;
 using Diwan.PL.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Diwan.PL.Controllers
 {
+    [Authorize]
     public class PostController : Controller
     {
         private readonly UserManager<DiwanUser> _userManager;
@@ -37,9 +38,32 @@ namespace Diwan.PL.Controllers
                 if (Post.Picture is not null)
                     MappedPost.PictureURL = Helpers.DocumentSettings.UploadFile(Post.Picture, "Posts");
                 MappedPost.AuthorId = Current;
+                if (Post.Visibility == DAL.Enums.Visibility.Public || Post.Visibility == DAL.Enums.Visibility.Friends)
+                {
+                    var CurrentUser = await _userManager.GetUserAsync(User);
+                    if (CurrentUser is null)
+                    {
+                        return RedirectToAction("Login", "Account");
+                    }
+                    var Friends = await _unitOfWork.FriendshipRepository.GetFirendsIDsAsync(CurrentUser.Id);
+                    foreach (var item in Friends)
+                    {
+                        var NewNotification = new Notification()
+                        {
+                            ActorUserId = CurrentUser.Id,
+                            Message = $"{CurrentUser.FirstName} {CurrentUser.LastName} Has Shared A New Post!",
+                            IsRead = false,
+                            RecipientUserId = item,
+                            NotificationType = DAL.Enums.NotificationType.NewSharedPost,
+                            URL = Url.Action("PostDetails", "Post", new { id = Post.Id })
+                        };
+                        await _unitOfWork.NotificationRepository.AddAsync(NewNotification);
+                    }
+                }
+
                 await _unitOfWork.PostRepository.AddAsync(MappedPost);
                 await _unitOfWork.CompleteAsync();
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Profile", "User", new { id = Current });
             }
             return View(Post);
         }
@@ -80,6 +104,7 @@ namespace Diwan.PL.Controllers
                         {
                             Post.PictureURL = Helpers.DocumentSettings.UploadFile(model.Picture, "Posts");
                         }
+                        Post.UpdatedAt = DateTime.Now;
                         _unitOfWork.PostRepository.Update(Post);
                         await _unitOfWork.CompleteAsync();
                         return RedirectToAction("PostDetails", "Post", new { id = model.Id });
@@ -109,7 +134,7 @@ namespace Diwan.PL.Controllers
                 }
                 _unitOfWork.PostRepository.Delete(Post);
                 await _unitOfWork.CompleteAsync();
-                return RedirectToAction("Profile", "User", new {id = Post.AuthorId});
+                return RedirectToAction("Profile", "User", new { id = Post.AuthorId });
             }
             return BadRequest();
         }
@@ -121,28 +146,22 @@ namespace Diwan.PL.Controllers
                 return Unauthorized();
             }
 
-            // 1. Check if a reaction from this user already exists on this post
             var existingReaction = await _unitOfWork.ReactionRepository.FindFirstAsync(
                 r => r.PostId == model.PostId && r.UserId == currentUserId
             );
 
-            // Case 1: A reaction already exists
             if (existingReaction != null)
             {
-                //var Notification = _unitOfWork.NotificationRepository.FindFirstAsync(N => N.);
-                // If the user clicked the SAME reaction again, they are "un-reacting"
                 if (existingReaction.ReactionType == model.ReactionType)
                 {
                     _unitOfWork.ReactionRepository.Delete(existingReaction);
                 }
-                // If the user clicked a DIFFERENT reaction, they are changing their mind
                 else
                 {
                     existingReaction.ReactionType = model.ReactionType;
                     _unitOfWork.ReactionRepository.Update(existingReaction);
                 }
             }
-            // Case 2: No reaction exists yet
             else
             {
                 var newReaction = new Reaction
@@ -154,17 +173,15 @@ namespace Diwan.PL.Controllers
                 await _unitOfWork.ReactionRepository.AddAsync(newReaction);
             }
 
-            // Save the change (create, update, or delete) to the database
             await _unitOfWork.CompleteAsync();
 
-            // 2. After saving, get the new counts to send back to the UI
             var allReactionsForPost = await _unitOfWork.ReactionRepository.FindAsync(r => r.PostId == model.PostId);
 
             var countsByType = allReactionsForPost
                 .GroupBy(r => r.ReactionType)
                 .ToDictionary(g => g.Key.ToString(), g => g.Count());
 
-            // 3. Return a JSON object with the updated counts
+            // Return a JSON object with the updated counts
             return Ok(new { totalCount = allReactionsForPost.Count(), countsByType });
         }
 

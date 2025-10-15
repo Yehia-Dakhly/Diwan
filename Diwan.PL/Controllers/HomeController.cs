@@ -3,12 +3,14 @@ using Diwan.BLL.Interfaces;
 using Diwan.DAL.Models;
 using Diwan.PL.Models;
 using Diwan.PL.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace Diwan.PL.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
