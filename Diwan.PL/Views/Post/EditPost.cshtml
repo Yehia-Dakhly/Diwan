@@ -1,0 +1,54 @@
+﻿@model EditPostViewModel
+@{
+    ViewData["Title"] = "Edit Post";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm p-4">
+        <h2 class="mb-4">Edit Post</h2>
+
+        <form asp-action="EditPost" method="post" enctype="multipart/form-data">
+            <input asp-for="Id" type="hidden" />
+            <input asp-for="AuthorId" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="Content" class="form-label"></label>
+                <textarea asp-for="Content" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Tag" class="form-label"></label>
+                <input asp-for="Tag" class="form-control" placeholder="e.g. #CSharp #ASP.NET" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Visibility" class="form-label"></label>
+                <select asp-for="Visibility" class="form-select" asp-items="Html.GetEnumSelectList<Visibility>()"></select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PictureURL" class="form-label"></label><br />
+                @if (!string.IsNullOrEmpty(Model.PictureURL))
+                {
+                    <img src="~/Images/@Model.PictureURL" alt="Post Picture" class="img-thumbnail mb-2" style="max-width:200px;" />
+                }
+                else
+                {
+                    <p class="text-muted">No image uploaded</p>
+                }
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Picture" class="form-label"></label>
+                <input asp-for="Picture" class="form-control" type="file" accept="image/*" />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

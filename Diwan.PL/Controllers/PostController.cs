@@ -45,7 +45,7 @@ namespace Diwan.PL.Controllers
         }
         public async Task<IActionResult> PostDetails(int id)
         {
-            var Post = await _unitOfWork.PostRepository.FindFirstAsync(P =>  P.Id == id, includes: [P => P.Comments, P => P.Reactions, P => P.Author]);
+            var Post = await _unitOfWork.PostRepository.FindFirstAsync(P => P.Id == id, includes: [P => P.Comments, P => P.Reactions, P => P.Author]);
             if (Post is not null)
             {
                 var MapppedPost = _mapper.Map<PostViewModel>(Post);
@@ -53,7 +53,66 @@ namespace Diwan.PL.Controllers
             }
             return NotFound();
         }
-
+        public async Task<IActionResult> EditPost([FromRoute] int id)
+        {
+            var CurrentUser = _userManager.GetUserId(User);
+            var Post = await _unitOfWork.PostRepository.FindFirstAsync(P => P.Id == id);
+            if (Post is not null && CurrentUser == Post.AuthorId)
+            {
+                var MappedPost = _mapper.Map<EditPostViewModel>(Post);
+                return View(MappedPost);
+            }
+            return BadRequest();
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditPost([FromRoute] int id, EditPostViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var CurrentUser = _userManager.GetUserId(User);
+                if (CurrentUser == model.AuthorId && id == model.Id)
+                {
+                    var Post = await _unitOfWork.PostRepository.FindFirstAsync(P => P.Id == model.Id);
+                    if (Post is not null)
+                    {
+                        _mapper.Map(model, Post);
+                        if (model.Picture is not null)
+                        {
+                            Post.PictureURL = Helpers.DocumentSettings.UploadFile(model.Picture, "Posts");
+                        }
+                        _unitOfWork.PostRepository.Update(Post);
+                        await _unitOfWork.CompleteAsync();
+                        return RedirectToAction("PostDetails", "Post", new { id = model.Id });
+                    }
+                }
+                return BadRequest();
+            }
+            return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeletePost([FromRoute] int id)
+        {
+            var CurrentUser = _userManager.GetUserId(User);
+            var Post = await _unitOfWork.PostRepository.FindFirstAsync(P => P.Id == id, includes: [P => P.Comments, P => P.Reactions]);
+            if (Post is not null && Post.AuthorId == CurrentUser)
+            {
+                var Reactions = await _unitOfWork.ReactionRepository.FindAsync(R => R.PostId == id);
+                foreach (var item in Reactions)
+                {
+                    _unitOfWork.ReactionRepository.Delete(item);
+                }
+                var Comments = await _unitOfWork.CommentRepository.FindAsync(P => P.PostId == id);
+                Comments = Comments.OrderByDescending(C => C.Id).ToList();
+                foreach (var item in Comments)
+                {
+                    _unitOfWork.CommentRepository.Delete(item);
+                }
+                _unitOfWork.PostRepository.Delete(Post);
+                await _unitOfWork.CompleteAsync();
+                return RedirectToAction("Profile", "User", new {id = Post.AuthorId});
+            }
+            return BadRequest();
+        }
         public async Task<IActionResult> ToggleReaction([FromBody] ReationViewModel model)
         {
             var currentUserId = _userManager.GetUserId(User);

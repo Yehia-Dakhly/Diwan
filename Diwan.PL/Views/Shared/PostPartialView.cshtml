@@ -8,7 +8,32 @@
             <span class="post-date">@Model?.CreatedAt.ToString("MMM dd, yyyy")</span>
         </div>
         </div>
+
     </a>
+
+
+
+    <div class="dropdown post-actions ms-auto">
+        <button class="btn btn-sm btn-light border-0" type="button" id="postMenuButton-@Model.Id" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-ellipsis-v"></i>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="postMenuButton-@Model.Id">
+            <li>
+                <a class="dropdown-item text-primary" asp-action="EditPost" asp-controller="Post" asp-route-id="@Model.Id">
+                    <i class="fas fa-edit me-2"></i> تعديل المنشور
+                </a>
+            </li>
+            <li>
+                <form asp-action="DeletePost" asp-controller="Post" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('هل أنت متأكد من حذف هذا المنشور؟');">
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="fas fa-trash-alt me-2"></i> حذف المنشور
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
 
     <div class="post-body">
         <p>@Model?.Content</p>
@@ -21,7 +46,6 @@
     <div class="card-footer post-footer">
         <div class="reaction-summary">
             @{
-                // جلب عدد كل تفاعل وتخزينه في متغير لسهولة الاستخدام
                 var likes = Model.CountByType.GetValueOrDefault(ReactionType.Like);
                 var loves = Model.CountByType.GetValueOrDefault(ReactionType.Love);
                 var hahas = Model.CountByType.GetValueOrDefault(ReactionType.Haha);
@@ -104,3 +128,39 @@
         </div>
     </div>
 </div>
+
+        @section Scripts{
+    <script>
+        $(document).on('click', '.delete-post', function (e) {
+            e.preventDefault();
+            const friendId = $(this).data('id');
+
+            if (confirm('هل أنت متأكد أنك تريد حذف هذا المنشور؟')) {
+                $.post('/Post/DeletePost/' + postId)
+                    .done(function () {
+                        alert('تم حذف المنشور بنجاح.');
+                        location.reload();
+                    })
+                    .fail(function () {
+                        alert('حدث خطأ أثناء الحذف.');
+                    });
+            }
+        });
+
+        $(document).on('click', '.Edit-post', function (e) {
+            e.preventDefault();
+            const friendId = $(this).data('id');
+
+                $.post('/Post/EditPost/' + postId)
+                    .done(function () {
+                        alert('تم تعديل المنشور.');
+                        location.reload();
+                    })
+                    .fail(function () {
+                        alert('حدث خطأ أثناء الحظر.');
+                    });
+            
+        });
+    </script>
+
+}

@@ -19,6 +19,7 @@ namespace Diwan.PL.MappingProfiles
                 .ReverseMap();
 
             CreateMap<CreatePostViewModel, Post>();
+            CreateMap<Post, EditPostViewModel>().ReverseMap();
 
         }
     }

@@ -130,7 +130,7 @@ namespace Diwan.PL.Controllers
                     };
                     await _unitOfWork.NotificationRepository.AddAsync(NewNotification);
                 }
-                
+
                 if (Parent.AuthorId != CurrentUser.Id)
                 {
                     var PostUserNotification = new Notification()
@@ -154,11 +154,13 @@ namespace Diwan.PL.Controllers
         {
             var UserId = _userManager.GetUserId(User);
 
-            if (_unitOfWork.CommentRepository.FindFirstAsync(C => C.UserId == UserId) != null)
+            if (await _unitOfWork.CommentRepository.FindFirstAsync(C => C.UserId == UserId) != null)
             {
                 int Temp = id;
                 List<Comment> V = new List<Comment>();
-                V.Add(await _unitOfWork.CommentRepository.FindFirstAsync(F => F.Id == id));
+                var Var = await _unitOfWork.CommentRepository.FindFirstAsync(F => F.Id == id);
+                if (Var is not null)
+                    V.Add(Var);
                 var New = await _unitOfWork.CommentRepository.FindFirstAsync(C => C.ParentId == Temp);
                 while (New != null)
                 {
