@@ -66,7 +66,6 @@ namespace Diwan.PL.Controllers
                     C => C.PostId == postId,
                     includes: [C => C.User]
                 );
-
                 var allCommentViewModels = _mapper.Map<IEnumerable<CommentViewModel>>(AllComments);
 
                 var commentLookup = allCommentViewModels.ToDictionary(c => c.Id);
@@ -83,7 +82,6 @@ namespace Diwan.PL.Controllers
                         topLevelComments.Add(comment);
                     }
                 }
-
                 var sortedComments = topLevelComments.OrderBy(c => c.CreatedAt).ToList();
 
                 return PartialView("_CommentList", sortedComments);

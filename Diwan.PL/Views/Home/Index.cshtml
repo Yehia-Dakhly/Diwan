@@ -36,7 +36,7 @@ else
                 var container = $('#comment-form-container-' + postId);
                 var isVisible = container.is(':visible');
 
-                $('.comment-form-container').hide().html(''); // أغلق أي فورمات أخرى
+                $('.comment-form-container').hide().html('');
 
                 if (!isVisible) {
                     container.html('<div class="text-center p-3">Loading...</div>').show();

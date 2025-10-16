@@ -7,7 +7,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-
+// Dark Mode
+// Loading Posts 5 by 5
+// Authoritize [Admin] -> View Users
+// Reaction Appears After Click
+// Hide The Menu of Edit and delete Post if I not the project Author
+// -> Private Account
+// -> Groups
 namespace Diwan.PL.Controllers
 {
     [Authorize]

@@ -34,7 +34,7 @@ namespace Diwan.PL.Controllers
             {
                 id = CurrentUser;
             }
-            var UserProfile = await _unitOfWork.UserRepository.FindFirstAsync(U => U.Id == id, includes: [U => U.Posts, U => U.Reactions, User => User.Comments]);
+            var UserProfile = await _unitOfWork.UserRepository.FindFirstAsync(U => U.Id == id, includes: [U => U.Posts, U => U.Reactions]);
             if (UserProfile is not null)
             {
                 var Posts = UserProfile.Posts.ToList();

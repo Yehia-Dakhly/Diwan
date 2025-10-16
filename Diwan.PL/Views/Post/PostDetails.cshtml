@@ -17,18 +17,16 @@ else
 }
 @section Scripts {
     <script>
-            // ########## ابدأ هنا ##########
         $(document).ready(function () {
             console.log("Page is ready. All scripts are now running.");
 
-            // ----- 1. منطق زر "كتابة تعليق" -----
             $(document).on('click', '.comment-button', function () {
                 console.log("Comment button clicked!");
                 var postId = $(this).data('postid');
                 var container = $('#comment-form-container-' + postId);
                 var isVisible = container.is(':visible');
 
-                $('.comment-form-container').hide().html(''); // أغلق أي فورمات أخرى
+                $('.comment-form-container').hide().html('');
 
                 if (!isVisible) {
                     container.html('<div class="text-center p-3">Loading...</div>').show();
@@ -40,7 +38,6 @@ else
                 }
             });
 
-            // ----- 2. منطق زر "عرض التعليقات" -----
             $(document).on('click', '.view-comments-button', function () {
                 console.log("View comments button clicked!");
                 var postId = $(this).data('postid');
@@ -58,7 +55,6 @@ else
                 }
             });
 
-            // ----- 3. منطق زر "التفاعل" -----
             $(document).on('click', '.reaction-icon', function (e) {
                 e.preventDefault();
                 console.log("Reaction icon clicked!");
@@ -68,13 +64,12 @@ else
                 var reactionTypeEnum = getReactionTypeEnum(reactionTypeString);
 
                 $.ajax({
-                    url: '/Post/ToggleReaction', // تأكد من أن هذا المسار صحيح
+                    url: '/Post/ToggleReaction',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({ postId: postId, reactionType: reactionTypeEnum }),
                     success: function (response) {
                         console.log("Reaction success:", response);
-                        // هنا ستقوم بتحديث واجهة المستخدم بعد النجاح
                     },
                     error: function (xhr) {
                         console.error("Reaction failed:", xhr.responseText);
@@ -82,7 +77,6 @@ else
                 });
             });
 
-            // دالة مساعدة لتحويل اسم التفاعل إلى رقم
             function getReactionTypeEnum(reactionName) {
                 switch (reactionName) {
                     case 'Like': return 1;
@@ -96,31 +90,24 @@ else
             }
 
         });
-        // ########## انتهي هنا ##########
         $(document).ready(function () {
-            // ... (كود عرض التعليقات وكتابة تعليق) ...
 
-            // ⬇️⬇️⬇️ هذا هو الكود الجديد ⬇️⬇️⬇️
-            // --- منطق زر "الرد" ---
             $(document).on('click', '.reply-button', function () {
                 var commentId = $(this).data('commentid');
                 var postId = $(this).data('postid');
                 var container = $('#reply-form-container-' + commentId);
                 var isVisible = container.is(':visible');
 
-                // قم بإخفاء كل فورمات الرد الأخرى المفتوحة
                 $('.reply-form-container').hide().html('');
 
                 if (!isVisible) {
                     container.html('<div class="spinner-border spinner-border-sm"></div>').show();
 
-                    // استدعاء الـ Action لجلب فورم الرد
                     $.get(`/Comment/ReplyComment?postId=${postId}&parentId=${commentId}`, function (data) {
                         container.html(data);
                     });
                 }
             });
-            // ⬆️⬆️⬆️ نهاية الكود الجديد ⬆️⬆️⬆️
         });
     </script>
 }
