@@ -4,8 +4,8 @@ namespace Diwan.PL.ViewModels
 {
     public class ForgetPassswordViewModel
     {
-        [Required(ErrorMessage = "Email is Required")]
-        [EmailAddress(ErrorMessage = "Invalid Email")]
+        [Required(ErrorMessage = "البريد الإلكتروني مطلوب")]
+        [EmailAddress(ErrorMessage = "بريد إلكتروني غير صالح")]
         public string Email { get; set; }
     }
 }

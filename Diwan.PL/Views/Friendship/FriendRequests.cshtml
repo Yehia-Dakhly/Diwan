@@ -3,37 +3,61 @@
     ViewData["Title"] = "طلبات الصداقة";
 }
 
-<h1>طلبات الصداقة</h1>
-<hr />
+<div class="friend-requests-page text-end" dir="rtl">
+    <div class="container friend-requests-container">
 
-@if (Model.Any())
-{
-    @foreach (var request in Model)
-    {
-        <div class="card mb-3">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <img src="~/Files/Images/@request.RequesterPictureUrl" alt="Profile Picture" class="rounded-circle me-3" style="width: 60px; height: 60px;" />
-                    <div>
-                        <h5 class="card-title mb-0">@request.RequesterName</h5>
-                        <small class="text-muted">أرسل لك طلب صداقة بتاريخ @request.CreatedAt.ToShortDateString()</small>
+        <h1 class="page-title">
+            <i class="bi bi-envelope-heart me-2"></i> طلبات الصداقة
+        </h1>
+
+        <hr class="title-divider mb-5" />
+
+        @if (Model.Any())
+        {
+            @foreach (var request in Model)
+            {
+                <div class="card mb-4 shadow-sm border-0">
+                    <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+                        <div class="d-flex align-items-center mb-2 mb-sm-0">
+                            <a asp-controller="Profile" asp-action="Profile" asp-route-id="@request.RequesterId"
+                               class="text-decoration-none text-dark d-flex align-items-center">
+                                <img src="~/Files/Images/@(string.IsNullOrEmpty(request.RequesterPictureUrl)
+                                                                         ? (request.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png")
+                                                                         : request.RequesterPictureUrl)"
+                             alt="Profile Picture"
+                             class="rounded-circle me-3 user-img" />
+                        <div>
+                            <h5 class="card-title mb-0">@request.RequesterName</h5>
+                            <small class="text-muted">أرسل لك طلب صداقة بتاريخ @request.CreatedAt.ToShortDateString()</small>
+                        </div>
+                    </a>
+                </div>
+
+                        <div class="d-flex">
+                            <form asp-action="AcceptRequest" method="post" class="me-2">
+                                <input type="hidden" name="friendshipId" value="@request.Id" />
+                                <button type="submit" class="btn btn-brown px-3">قبول</button>
+                            </form>
+                            <form asp-action="DeclineRequest" method="post">
+                                <input type="hidden" name="friendshipId" value="@request.Id" />
+                                <button type="submit" class="btn btn-danger px-3">رفض</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex">
-                    <form asp-action="AcceptRequest" method="post" class="me-2">
-                        <input type="hidden" name="friendshipId" value="@request.Id" />
-                        <button type="submit" class="btn btn-success">قبول</button>
-                    </form>
-                    <form asp-action="DeclineRequest" method="post">
-                        <input type="hidden" name="friendshipId" value="@request.Id" />
-                        <button type="submit" class="btn btn-danger">رفض</button>
-                    </form>
-                </div>
+                }
+        }
+        else
+        {
+            <div class="text-center mt-5">
+                <p class="no-requests">لا يوجد طلبات صداقة معلقة حاليًا 🌸</p>
             </div>
-        </div>
-    }
-}
-else
-{
-    <p>لا يوجد طلبات صداقة معلقة.</p>
+        }
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/FriendRequests.css" />
+
 }

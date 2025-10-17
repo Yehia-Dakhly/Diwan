@@ -38,5 +38,49 @@ namespace Diwan.BLL.Repositories
             var Posts = await _diwanDbContext.Posts.Where(P => P.AuthorId == id).Include(P => P.Reactions).Include(P => P.Comments).OrderByDescending(P => P.CreatedAt).ToListAsync();
             return Posts;
         }
+
+        public async Task<IEnumerable<Post>> GetFriendsPostsPagedAsync(string id, int pageNumber, int pageSize)
+        {
+            var Friends = await _diwanDbContext.Friendships
+                .Where(f =>
+                    f.Status == DAL.Enums.FriendRequestStatus.Accepted &&
+                    (f.RequesterId == id || f.AddresseeId == id)
+                )
+                .Select(f => f.RequesterId == id ? f.AddresseeId : f.RequesterId)
+                .ToListAsync();
+
+            var Posts = await _diwanDbContext.Posts
+                .Where(p =>
+                    ((p.Visibility != DAL.Enums.Visibility.Private) && Friends.Contains(p.AuthorId))
+                    || p.AuthorId == id
+                    || p.Visibility == DAL.Enums.Visibility.Public
+                )
+                .Include(p => p.Author)
+                .Include(p => p.Reactions)
+                .Include(p => p.Comments)
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Posts;
+        }
+
+
+        public async Task<IEnumerable<Post>> GetUserPostsPagedAsync(string id, int pageNumber, int pageSize)
+        {
+            var Posts = await _diwanDbContext.Posts
+                .Where(p => p.AuthorId == id)
+                .Include(p => p.Author)
+                .Include(p => p.Reactions)
+                .Include(p => p.Comments)
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Posts;
+        }
+
     }
 }

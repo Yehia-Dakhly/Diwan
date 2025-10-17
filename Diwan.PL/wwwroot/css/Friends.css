@@ -1,0 +1,244 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Amiri&family=Cairo:wght@400;600;700&family=Noto+Naskh+Arabic&display=swap');
+
+body {
+    font-family: 'Cairo', sans-serif;
+    background-color: #f5e0c8;
+    color: #3b2b25;
+    margin: 0;
+    padding: 0;
+}
+
+.friends-container {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 80px 1.5rem;
+    background-color: #fdfcfb;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+h1 {
+    text-align: center;
+    color: #5c3317;
+    font-family: 'Amiri', serif;
+    font-weight: 700;
+    font-size: 2.3rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+    h1::after {
+        content: "";
+        display: block;
+        width: 120px;
+        height: 3px;
+        background-color: #6b3b1a;
+        margin: 12px auto 2.5rem;
+        border-radius: 3px;
+    }
+
+.list-group {
+    border: none;
+}
+
+.list-group-item {
+    background-color: #fffdf9;
+    border: 1px solid #e0d6cc;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(59, 43, 37, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .list-group-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    }
+
+    .list-group-item a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        color: #3b2b25;
+        flex-grow: 1;
+    }
+
+.user-img {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #d6bfa8;
+    margin: 0;
+}
+
+.card-title,
+.list-group-item h5 {
+    font-family: 'Amiri', serif;
+    font-weight: bold;
+    color: #3b2b25;
+    margin-bottom: 0;
+}
+
+.btn-light {
+    background-color: #f4eee8;
+    color: #3b2b25;
+    border: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+    .btn-light:hover {
+        background-color: #e0d6cc;
+        transform: scale(1.05);
+    }
+
+.dropdown-menu {
+    border-radius: 10px;
+    border: 1px solid #d8cfc2;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    text-align: right;
+}
+
+.dropdown-item {
+    transition: background 0.2s ease;
+}
+
+    .dropdown-item:hover {
+        background-color: #f8f1ea;
+    }
+
+.no-friends {
+    text-align: center;
+    color: #6b5a54;
+    background: #fff7f0;
+    padding: 2rem;
+    border-radius: 15px;
+    border: 1px dashed #cbb6a0;
+    margin-top: 3rem;
+    font-family: 'Noto Naskh Arabic', serif;
+}
+
+    .no-friends i {
+        color: #bca89f;
+    }
+
+.btn-primary {
+    background-color: #6b3b1a;
+    border: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+}
+
+    .btn-primary:hover {
+        background-color: #5c3317;
+        transform: scale(1.05);
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 576px) {
+    .list-group-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .user-img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .dropdown {
+        align-self: flex-end;
+    }
+}
+
+.dark-mode body,
+body.dark-mode {
+    background-color: #2e1f18;
+    color: #f1e7dc;
+}
+
+.dark-mode .friends-container {
+    background-color: #2b1b11;
+    
+}
+
+.dark-mode h1 {
+    color: #f8e4c6;
+}
+
+    .dark-mode h1::after {
+        background-color: #b88858;
+    }
+
+.dark-mode .list-group-item {
+    background-color: #6e5845;
+    border: 1px solid #4b3f35;
+    box-shadow: none;
+}
+
+    .dark-mode .list-group-item:hover {
+        box-shadow: 0 6px 14px rgba(255, 220, 180, 0.08);
+    }
+
+.dark-mode .user-img {
+    border-color: #7b5f4c;
+}
+
+.dark-mode .btn-light {
+    background-color: #3a332f;
+    color: #f2e4d1;
+}
+
+    .dark-mode .btn-light:hover {
+        background-color: #4c4037;
+    }
+
+.dark-mode .dropdown-menu {
+    background-color: #2e2823;
+    border-color: #4b3f35;
+}
+
+.dark-mode .dropdown-item {
+    color: #f1e7dc;
+}
+
+    .dark-mode .dropdown-item:hover {
+        background-color: #3a332f;
+    }
+
+.dark-mode .btn-primary {
+    background-color: #b88858;
+    color: #1e1b18;
+}
+
+    .dark-mode .btn-primary:hover {
+        background-color: #e3b97f;
+    }
+
+.dark-mode .no-friends {
+    background-color: #27221e;
+    border: 1px dashed #6b5547;
+    color: #f2e4d1;
+}
+
+    .dark-mode .no-friends i {
+        color: #a68d7a;
+    }

@@ -1,20 +1,153 @@
 ﻿@model CommentCreateViewModel
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap');
 
-<form asp-action="CreateComment" asp-controller="Comment">
-    <input hidden asp-for="PostId" />
-    <div class="mb-2">
-        <textarea asp-for="Content" class="form-control" rows="3" placeholder="اكتب تعليقك..."></textarea>
+    .comment-form-container {
+        background-color: #fff8f1;
+        border: 1px solid #b9977b;
+        border-radius: 10px;
+        padding: 15px 18px;
+        margin-top: 15px;
+        animation: fadeIn 0.6s ease-in-out;
+        font-family: 'Cairo', sans-serif;
+        transition: background-color 0.4s, border-color 0.4s, color 0.4s;
+    }
+
+    .comment-form-container .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .comment-form-container textarea {
+        width: 100%;
+        resize: none;
+        padding: 12px 14px;
+        border: 1px solid #b9977b;
+        border-radius: 8px;
+        background-color: #fffaf5;
+        font-size: 15px;
+        color: #5c3317;
+        outline: none;
+        transition: border-color 0.3s, box-shadow 0.3s, background-color 0.4s, color 0.4s;
+        font-family: 'Noto Naskh Arabic', serif;
+        box-sizing: border-box;
+    }
+
+        .comment-form-container textarea:focus {
+            border-color: #8c6a5d;
+            box-shadow: 0 0 5px rgba(139, 105, 86, 0.3);
+        }
+
+    .comment-form-container .text-danger {
+        color: #a94442;
+        font-size: 13px;
+        font-family: 'Cairo', sans-serif;
+    }
+
+    .comment-btn {
+        align-self: flex-end;
+        background-color: #5c3317;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        font-family: 'Cairo', sans-serif;
+        margin-top: 5px;
+    }
+
+        .comment-btn:hover {
+            background-color: #3f2211;
+        }
+
+    .dark-mode .comment-form-container,
+    [data-theme="dark"] .comment-form-container {
+        background-color: #3e2723;
+        border-color: #6b3b1a;
+        color: #f5e0c8;
+    }
+
+        .dark-mode .comment-form-container textarea,
+        [data-theme="dark"] .comment-form-container textarea {
+            background-color: #2a1e16;
+            color: #f5e0c8;
+            border-color: #6b3b1a;
+        }
+
+            .dark-mode .comment-form-container textarea:focus,
+            [data-theme="dark"] .comment-form-container textarea:focus {
+                border-color: #b97a55;
+                box-shadow: 0 0 6px rgba(185, 122, 85, 0.4);
+            }
+
+    .dark-mode .comment-btn,
+    [data-theme="dark"] .comment-btn {
+        background-color: #8c5b38;
+        color: #fff;
+    }
+
+        .dark-mode .comment-btn:hover,
+        [data-theme="dark"] .comment-btn:hover {
+            background-color: #a56b45;
+        }
+
+    @@media (max-width: 480px) {
+        .comment-form-container
+
+    {
+        padding: 12px;
+    }
+
+    .comment-form-container textarea {
+        font-size: 14px;
+    }
+
+    .comment-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+</style>
+<form asp-action="CreateComment" asp-controller="Comment" method="post" class="comment-form-container">
+    <input type="hidden" asp-for="PostId" />
+
+    <div class="form-group">
+        <textarea asp-for="Content" rows="3" placeholder="اكتب تعليقك..." autofocus></textarea>
         <span asp-validation-for="Content" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary btn-sm">نشر التعليق</button>
+
+    <button type="submit" class="comment-btn">نشر التعليق</button>
 </form>
 
-
 <script>
-    document.querySelector("form").addEventListener("submit", function (e) {
+    document.querySelector(".comment-form-container").addEventListener("submit", function (e) {
         const textarea = this.querySelector("textarea");
         textarea.value = textarea.value
-            .replace(/^\s*(\r?\n)+/, "")   // إزالة الأسطر الفاضية من البداية
-            .replace(/(\r?\n)+\s*$/, "");  // إزالة الأسطر الفاضية من النهاية
+            .replace(/^\s*(\r?\n)+/, "")
+            .replace(/(\r?\n)+\s*$/, "");
     });
 </script>
+@section Styles {
+    <link rel="stylesheet" href="~/css/Register.css" />
+    <partial name="AuthSection" />
+}

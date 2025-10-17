@@ -5,99 +5,62 @@
     ViewData["Title"] = Model.FullName;
 }
 
-<style>
-    .profile-header {
-        position: relative;
-        margin-bottom: 20px;
-    }
-    .cover-photo {
-        width: 100%;
-        height: 300px;
-        object-fit: cover;
-        border-radius: 8px;
-    }
-    .profile-picture {
-        position: absolute;
-        bottom: -75px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        border: 5px solid white;
-        object-fit: cover;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .profile-info {
-        text-align: center;
-        margin-top: 90px; /* Space for the profile picture */
-    }
-    .profile-actions {
-        text-align: center;
-        margin-top: 20px;
-        margin-bottom: 40px;
-    }
-    .post-card {
-        background-color: #ffffff;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        padding: 20px;
-        font-family: 'Times New Roman', Times, serif;
-    }
-</style>
+<div class="profile-container">
+    <div class="profile-header shadow-sm position-relative">
+        <img src="~/Files/Images/@Model.CoverPicURL" alt="Cover Photo" class="cover-photo" />
+        <img src="~/Files/Images/@(string.IsNullOrEmpty(Model.PictureURL)
+                         ? (Model.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png")
+                         : Model.PictureURL)" alt="Profile Picture" class="profile-picture" />
+    </div>
 
-<div class="profile-header">
-    <img src="~/Files/Images/@Model.CoverPicURL" alt="Cover Photo" class="cover-photo shadow-sm" />
-    <img src="~/Files/Images/@(string.IsNullOrEmpty(Model.PictureURL) ? (Model.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png") : Model.PictureURL)" alt="Profile Picture" class="profile-picture" />
-</div>
+    <div class="profile-info">
+        <h1 class="profile-name">@Model.FullName</h1>
+        <p class="profile-bio">"@(Model.Bio ?? "قارئ وكاتب في ديوان")"</p>
+        <p class="profile-dob"><i class="fas fa-birthday-cake me-2"></i>@Model.DateOfBirth.ToString("dd MMMM yyyy")</p>
+    </div>
 
-<div class="profile-info">
-    <h1 class="display-5">@Model.FullName</h1>
-    <p class="lead text-muted">"@(Model.Bio ?? "قارئ وكاتب في ديوان")"</p>
-</div>
-
-<div class="profile-actions">
-    @if (Model.IsCurrentUserProfile)
-    {
-        <a asp-action="EditProfile" asp-route-id="@Model.Id" asp-controller="User" class="btn btn-outline-secondary">تعديل الملف الشخصي</a>
-    }
-    else
-    {
-        @if (Model.FriendshipStatus == null || Model.FriendshipStatus == FriendRequestStatus.Declined || Model.FriendshipStatus == FriendRequestStatus.Unknown)
+    <div class="profile-actions">
+        @if (Model.IsCurrentUserProfile)
         {
-            <form asp-action="RequestFriend" asp-controller="Friendship" method="post">
-                <input type="hidden" name="addresseeId" value="@Model.Id" />
-                <button type="submit" class="btn btn-success"><i class="fas fa-user-plus"></i> إضافة صديق</button>
-            </form>
-        }
-        else if (Model.FriendshipStatus == FriendRequestStatus.Pending)
-        {
-            @if (Model.IsFriendshipInitiator)
-            {
-                <button class="btn btn-secondary" disabled>تم إرسال الطلب</button>
-            }
-            else
-            {
-                <a asp-action="AcceptRequest" asp-controller="Friendship" class="btn btn-info">الرد على الطلب</a>
-            }
-        }
-        else if (Model.FriendshipStatus == FriendRequestStatus.Accepted)
-        {
-            <button class="btn btn-primary" disabled><i class="fas fa-check"></i> أصدقاء</button>
+            <a asp-action="EditProfile" asp-route-id="@Model.Id" asp-controller="Profile" class="btn btn-edit-profile">
+                تعديل الملف الشخصي
+            </a>
         }
         else
         {
-            <button class="btn btn-danger" disabled><i class="fas alert-danger"></i> محظور</button>
+            @if (Model.FriendshipStatus == null || Model.FriendshipStatus == FriendRequestStatus.Declined || Model.FriendshipStatus == FriendRequestStatus.Unknown)
+            {
+                <form asp-action="RequestFriend" asp-controller="Friendship" method="post" class="d-inline">
+                    <input type="hidden" name="addresseeId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-add-friend"><i class="fas fa-user-plus me-1"></i>إضافة صديق</button>
+                </form>
+            }
+            else if (Model.FriendshipStatus == FriendRequestStatus.Pending)
+            {
+                @if (Model.IsFriendshipInitiator)
+                {
+                    <button class="btn btn-secondary" disabled>تم إرسال الطلب</button>
+                }
+                else
+                {
+                    <a asp-action="AcceptRequest" asp-controller="Friendship" class="btn btn-info">الرد على الطلب</a>
+                }
+            }
+            else if (Model.FriendshipStatus == FriendRequestStatus.Accepted)
+            {
+                <button class="btn btn-primary" disabled><i class="fas fa-check"></i> أصدقاء</button>
+            }
+            else
+            {
+                <button class="btn btn-danger" disabled><i class="fas fa-ban"></i> محظور</button>
+            }
         }
-    }
-</div>
+    </div>
 
-<hr />
+    <hr class="divider" />
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <h3 class="mb-4 text-center">منشورات @Model.FullName</h3>
+    <div class="posts-section">
+        <h3 class="section-title">منشورات @Model.FullName</h3>
         @if (Model.Posts != null && Model.Posts.Any())
         {
             @foreach (var post in Model.Posts)
@@ -111,28 +74,34 @@
         }
     </div>
 </div>
+
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             console.log("Page is ready. All scripts are now running.");
 
-            $(document).on('click', '.comment-button', function () {
-                console.log("Comment button clicked!");
-                var postId = $(this).data('postid');
-                var container = $('#comment-form-container-' + postId);
-                var isVisible = container.is(':visible');
+                    $(document).on('click', '.comment-button', function () {
+            console.log("Comment button clicked!");
+            var postId = $(this).data('postid');
+            var container = $('#comment-form-container-' + postId);
 
-                $('.comment-form-container').hide().html('');
+            if (container.is(':visible')) {
+                container.slideUp(200, function () {
+                    container.html('');
+                });
+                return;
+            }
 
-                if (!isVisible) {
-                    container.html('<div class="text-center p-3">Loading...</div>').show();
-                    $.get("/Comment/CreateComment?id=" + postId, function (data) {
-                        container.html(data);
-                    }).fail(function() {
-                        container.html('<p class="text-danger text-center">Failed to load form.</p>');
-                    });
-                }
+            $('.comment-form-container').hide().html('');
+            container.html('<div class="text-center p-3">Loading...</div>').slideDown();
+
+            $.get("/Comment/CreateComment?id=" + postId, function (data) {
+                container.html(data);
+            }).fail(function () {
+                container.html('<p class="text-danger text-center">Failed to load form.</p>');
             });
+        });
 
             $(document).on('click', '.view-comments-button', function () {
                 console.log("View comments button clicked!");
@@ -151,27 +120,51 @@
                 }
             });
 
-            $(document).on('click', '.reaction-icon', function (e) {
-                e.preventDefault();
-                console.log("Reaction icon clicked!");
-                var button = $(this);
-                var postId = button.data('postid');
-                var reactionTypeString = button.data('reactiontype');
-                var reactionTypeEnum = getReactionTypeEnum(reactionTypeString);
+                    $(document).on('click', '.reaction-icon', function (e) {
+            e.preventDefault();
+            var button = $(this);
+            var postId = button.data('postid');
+            var reactionTypeString = button.data('reactiontype');
+            var reactionTypeEnum = getReactionTypeEnum(reactionTypeString);
 
-                $.ajax({
-                    url: '/Post/ToggleReaction',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ postId: postId, reactionType: reactionTypeEnum }),
-                    success: function (response) {
-                        console.log("Reaction success:", response);
-                    },
-                    error: function (xhr) {
-                        console.error("Reaction failed:", xhr.responseText);
+            $.ajax({
+                url: '/Post/ToggleReaction',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ postId: postId, reactionType: reactionTypeEnum }),
+                success: function (response) {
+                    console.log("Reaction success:", response);
+
+
+                    if (response && response.countByType) {
+                        const postCard = button.closest('.post-card');
+                        const reactionSummary = postCard.find('.reaction-summary');
+                        reactionSummary.empty();
+
+                        const icons = {
+                            Like: '<i class="fas fa-thumbs-up text-primary"></i>',
+                            Love: '<i class="fas fa-heart text-danger"></i>',
+                            Haha: '<i class="fas fa-laugh-squint text-warning"></i>',
+                            Wow: '<i class="fas fa-surprise text-info"></i>',
+                            Sad: '<i class="fas fa-sad-tear text-info"></i>',
+                            Angry: '<i class="fas fa-angry text-danger"></i>'
+                        };
+
+                        for (const [type, count] of Object.entries(response.countByType)) {
+                            if (count > 0) {
+                                reactionSummary.append(
+                                    `<div class="reaction-item">${icons[type]} <span>${count}</span></div>`
+                                );
+                            }
+                        }
                     }
-                });
+                },
+                error: function (xhr) {
+                    console.error("Reaction failed:", xhr.responseText);
+                }
             });
+        });
+
 
             function getReactionTypeEnum(reactionName) {
                 switch (reactionName) {
@@ -186,5 +179,30 @@
             }
 
         });
+        $(document).ready(function () {
+
+            $(document).on('click', '.reply-button', function () {
+                var commentId = $(this).data('commentid');
+                var postId = $(this).data('postid');
+                var container = $('#reply-form-container-' + commentId);
+                var isVisible = container.is(':visible');
+
+                $('.reply-form-container').hide().html('');
+
+                if (!isVisible) {
+                    container.html('<div class="spinner-border spinner-border-sm"></div>').show();
+
+                    $.get(`/Comment/ReplyComment?postId=${postId}&parentId=${commentId}`, function (data) {
+                        container.html(data);
+                    });
+                }
+            });
+        });
     </script>
 }
+@section Styles {
+    <link rel="stylesheet" href="~/css/Profile.css" />
+
+}
+
+

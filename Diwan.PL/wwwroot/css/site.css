@@ -1,4 +1,92 @@
-﻿html {
+﻿
+.dropdown-menu.show {
+    background: #6d4c41;
+}
+.dark-mode.dropdown-menu.show {
+    background: #f8efe3;
+}
+.notification-item {
+    border-radius: 10px;
+    transition: all 0.25s ease-in-out;
+    font-family: 'Cairo', sans-serif;
+}
+
+    .notification-item.unread {
+        background-color: #f8efe3;
+    }
+
+    .notification-item.read {
+        background-color: transparent;
+    }
+
+    .notification-item:hover {
+        background-color: #f3e3cf;
+        transform: translateY(-2px);
+    }
+
+.notification-img {
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    border: 2px solid #d6bfa8;
+}
+
+.notification-content {
+    line-height: 1.4;
+}
+
+    .notification-content .message {
+        font-weight: 600;
+        color: #3b2b25;
+        font-family: 'Noto Naskh Arabic', serif;
+    }
+
+    .notification-content .time {
+        font-size: 0.8rem;
+        color: #8c7a6e;
+    }
+
+.view-all {
+    color: #6b3b1a !important;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+    .view-all:hover {
+        color: #5c3317 !important;
+    }
+
+.dark-mode .notification-item.unread {
+    background-color: #2e2823;
+}
+
+.dark-mode .notification-item:hover {
+    background-color: #3a332f;
+}
+
+.dark-mode .notification-img {
+    border-color: #7b5f4c;
+}
+
+.dark-mode .notification-content .message {
+    color: #f1e7dc;
+}
+
+.dark-mode .notification-content .time {
+    color: #bca89f;
+}
+
+.dark-mode .view-all {
+    color: #b88858 !important;
+}
+
+    .dark-mode .view-all:hover {
+        color: #e3b97f !important;
+    }
+
+
+
+html {
   font-size: 14px;
 }
 
@@ -52,9 +140,9 @@ body {
     padding: 6px 10px;
 }
 
-/*.comment-body {
+.comment-body {
     margin-bottom: 4px;
-}*/
+}
 
 .comment-meta {
     font-size: 0.85rem;
@@ -73,3 +161,19 @@ body {
     .reply .comment-main{
         background-color: darkgray;
     }
+
+
+
+
+.reaction-palette {
+    display: none;
+    position: absolute;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px 8px;
+}
+
+.reaction-container:hover .reaction-palette {
+    display: flex;
+}

@@ -4,8 +4,110 @@
     ViewData["Title"] = "أصدقائي";
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4">قائمة الأصدقاء</h1>
+<style>
+    body {
+        background-color: #f8f5f1;
+        font-family: "Noto Naskh Arabic", "Cairo", serif;
+    }
+
+    .friends-container {
+        max-width: 850px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    h1 {
+        text-align: center;
+        color: #3b2b25;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+
+        h1::after {
+            content: "";
+            display: block;
+            width: 120px;
+            height: 3px;
+            background-color: #8c6a5d;
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+    .list-group {
+        border: none;
+    }
+
+    .list-group-item {
+        background-color: #fffdf9;
+        border: 1px solid #e0d6cc;
+        border-radius: 15px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 6px rgba(59, 43, 37, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .list-group-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(59, 43, 37, 0.15);
+        }
+
+        .list-group-item h5 {
+            color: #3b2b25;
+            font-weight: 600;
+        }
+
+    .btn-light {
+        background-color: #f4eee8;
+        color: #3b2b25;
+    }
+
+        .btn-light:hover {
+            background-color: #e0d6cc;
+            transform: scale(1.05);
+        }
+
+    .dropdown-menu {
+        border-radius: 10px;
+        border: 1px solid #d8cfc2;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .dropdown-item {
+        transition: background 0.2s;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f8f1ea;
+        }
+
+    .no-friends {
+        text-align: center;
+        color: #6b5a54;
+        background: #fff7f0;
+        padding: 2rem;
+        border-radius: 15px;
+        border: 1px dashed #cbb6a0;
+        margin-top: 3rem;
+    }
+
+        .no-friends i {
+            color: #bca89f;
+        }
+
+    .btn-primary {
+        background-color: #7b5e57;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #5a3c2d;
+            transform: scale(1.05);
+        }
+</style>
+
+<div class="friends-container">
+    <h1>أصدقائي</h1>
 
     @if (Model != null && Model.Any())
     {
@@ -15,10 +117,10 @@
                 <div class="list-group-item d-flex align-items-center justify-content-between p-3">
 
                     <a asp-controller="Profile" asp-action="Profile" asp-route-id="@friend.Id" class="d-flex align-items-center text-decoration-none text-dark flex-grow-1">
-                        <img src="~/Files/Images/@friend.PictureURL"
+                        <img src="~/Files/Images/@(string.IsNullOrEmpty(friend.PictureURL) ? (friend.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png") : friend.PictureURL)"
                              alt="Profile Picture"
                              class="rounded-circle me-3"
-                             style="width: 50px; height: 50px; object-fit: cover;" />
+                             style="width: 55px; height: 55px; object-fit: cover;" />
 
                         <div class="flex-grow-1">
                             <h5 class="mb-1">@friend.FullName</h5>
@@ -47,20 +149,20 @@
                         </ul>
                     </div>
                 </div>
-
             }
         </div>
     }
     else
     {
-        <div class="text-center mt-5">
-            <i class="fas fa-users-slash fa-3x text-muted"></i>
-            <p class="mt-3">ليس لديك أي أصدقاء حتى الآن. ابدأ بالبحث عن أصدقاء جدد!</p>
-            <a asp-controller="Friendship" asp-action="AddFriend" class="btn btn-primary mt-2">ابحث عن أصدقاء</a>
+        <div class="no-friends">
+            <i class="fas fa-users-slash fa-3x mb-3"></i>
+            <p class="mt-2">ليس لديك أي أصدقاء بعد... 🌸</p>
+            <a asp-controller="Friendship" asp-action="AddFriend" class="btn btn-primary mt-2 px-4">ابحث عن أصدقاء</a>
         </div>
     }
 </div>
-@section Scripts{
+
+@section Scripts {
     <script>
         $(document).on('click', '.delete-friend', function (e) {
             e.preventDefault();
@@ -94,5 +196,8 @@
             }
         });
     </script>
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Friends.css" />
 
 }

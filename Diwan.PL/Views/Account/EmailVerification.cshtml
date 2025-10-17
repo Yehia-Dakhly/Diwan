@@ -1,0 +1,136 @@
+﻿@{
+    ViewData["Title"] = "تأكيد البريد الإلكتروني";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="email-verification-container fade-in">
+    <div class="icon-container">
+        <i class="fas fa-envelope-circle-check"></i>
+    </div>
+
+    <h2 class="title">تم إرسال رسالة تأكيد</h2>
+    <p class="message">
+        لقد أرسلنا رسالة إلى بريدك الإلكتروني تحتوي على رابط لتأكيد الحساب.<br />
+        من فضلك تحقق من بريدك واضغط على الرابط لتفعيل حسابك.
+    </p>
+
+    @* <form asp-action="ResendConfirmationEmail" method="post" class="resend-form">
+        <button type="submit" class="btn btn-primary">إعادة إرسال الرسالة</button>
+    </form> *@
+</div>
+@section _ValidationScriptsPartial {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@section AuthSection {
+    <partial name="AuthSection" />
+    <style>
+        @@import url('https://fonts.googleapis.com/css2?family=Amiri&family=Cairo:wght@400;600;700&display=swap');
+
+        :root {
+            --brown-main: #6b3b1a;
+            --brown-dark: #5c3317;
+            --beige-bg: #f5e0c8;
+            --white: #fff;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--beige-bg);
+            color: var(--brown-dark);
+        }
+
+        .email-verification-container {
+            max-width: 500px;
+            margin: 120px auto;
+            background-color: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            animation: fadeIn 0.7s ease-in-out;
+        }
+
+        .icon-container {
+            font-size: 4rem;
+            color: var(--brown-main);
+            margin-bottom: 1rem;
+        }
+
+        .title {
+            font-family: 'Amiri', serif;
+            color: var(--brown-dark);
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            color: var(--brown-main);
+            font-size: 1.1rem;
+            margin-bottom: 1.8rem;
+            line-height: 1.6;
+        }
+
+        .btn-primary {
+            background-color: var(--brown-main);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 600;
+            padding: 0.7rem 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: var(--brown-dark);
+                transform: translateY(-2px);
+            }
+
+        @@keyframes fadeIn {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        .dark-mode body {
+            background-color: #1e1b18;
+            color: #f1e7dc;
+        }
+
+        .dark-mode .email-verification-container {
+            background-color: #25211d;
+            box-shadow: 0 4px 10px rgba(255, 220, 180, 0.1);
+        }
+
+        .dark-mode .icon-container {
+            color: #b88858;
+        }
+
+        .dark-mode .btn-primary {
+            background-color: #b88858;
+            color: #1e1b18;
+        }
+
+            .dark-mode .btn-primary:hover {
+                background-color: #e3b97f;
+            }
+
+        @@media (max-width: 576px) {
+            .email-verification-container
+
+        {
+            margin: 80px 1rem;
+            padding: 1.5rem;
+        }
+
+        }
+    </style>
+}

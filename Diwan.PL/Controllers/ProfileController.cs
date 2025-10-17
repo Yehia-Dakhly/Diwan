@@ -102,7 +102,7 @@ namespace Diwan.PL.Controllers
                 _mapper.Map(model, UserProfile);
                 _unitOfWork.UserRepository.Update(UserProfile);
                 await _unitOfWork.CompleteAsync();
-                return RedirectToAction("Profile", "User", new { id = model.Id });
+                return RedirectToAction("Profile", "Profile", new { id = model.Id });
             }
             return BadRequest();
         }

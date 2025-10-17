@@ -4,12 +4,20 @@
 {
     @foreach (var notification in Model)
     {
-        <li>
-            <a class="dropdown-item d-flex align-items-center p-2" asp-action="ReadNotification" asp-route-id="@notification.Id" asp-route-url="@notification.URL" asp-controller="Notification" >
-                <img src="~/Files/Images/@notification.PictureURL" class="rounded-circle me-2" style="width:40px; height:40px; object-fit: cover;" />
-                <div class="p-2 mb-2 rounded" style="@(notification.IsRead ? "" : "background-color: #f2f2f2;")">
-                    <small style="font-weight: 500;">@notification.Message</small><br />
-                    <small class="text-muted">@notification.CreatedAt.ToShortTimeString()</small>
+        <li class="notification-item @(notification.IsRead ? "read" : "unread")">
+            <a class="dropdown-item d-flex align-items-center gap-2"
+               asp-action="ReadNotification"
+               asp-route-id="@notification.Id"
+               asp-route-url="@notification.URL"
+               asp-controller="Notification">
+
+                <img src="~/Files/Images/@notification.PictureURL"
+                     alt="Profile"
+                     class="notification-img rounded-circle" />
+
+                <div class="notification-content flex-grow-1">
+                    <small class="message">@notification.Message</small><br />
+                    <small class="time text-muted">@notification.CreatedAt.ToShortTimeString()</small>
                 </div>
             </a>
         </li>
@@ -17,8 +25,10 @@
 }
 else
 {
-    <li><span class="dropdown-item text-muted text-center p-3">لا توجد إشعارات جديدة</span></li>
+    <li>
+        <span class="dropdown-item text-muted text-center p-3">لا توجد إشعارات جديدة</span>
+    </li>
 }
 
 <li><hr class="dropdown-divider"></li>
-<li><a class="dropdown-item text-center" href="#">عرض كل الإشعارات</a></li>
+<li><a class="dropdown-item text-center view-all" href="#">عرض كل الإشعارات</a></li>

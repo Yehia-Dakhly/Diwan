@@ -3,6 +3,7 @@ using Diwan.BLL.Interfaces;
 using Diwan.BLL.Repositories;
 using Diwan.DAL.Contexts;
 using Diwan.DAL.Models;
+using Diwan.PL.Helpers;
 using Diwan.PL.MappingProfiles;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -30,6 +31,7 @@ namespace Diwan.PL
             builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             builder.Services.AddAutoMapper(M => M.AddProfiles(new List<Profile>() { new PostProfile(), new UserProfile(), new FriendshipProfile(), new NotificationProfile(), new CommentProfile()}));
             builder.Services.AddIdentity<DiwanUser, IdentityRole>(Options =>
             {

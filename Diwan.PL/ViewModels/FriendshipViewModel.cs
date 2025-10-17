@@ -10,6 +10,7 @@ namespace Diwan.PL.ViewModels
         public required string RequesterId { get; set; }
         public required string RequesterName { get; set; }
         public string? RequesterPictureUrl { get; set; }
+        public Gender? Gender { get; set; }
         public DateTime CreatedAt { get; set; }
 
     }

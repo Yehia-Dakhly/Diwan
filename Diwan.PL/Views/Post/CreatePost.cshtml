@@ -2,50 +2,55 @@
 @using Microsoft.AspNetCore.Identity
 @model CreatePostViewModel
 @inject UserManager<DiwanUser> UserManager
+
 @{
     var CurrentUser = await UserManager.GetUserAsync(User);
-}
-@{
-    ViewData["Title"] = "Create Post";
+    ViewData["Title"] = "إنشاء منشور جديد";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="create-post-container">
-    <h2>Create a new post</h2>
+    <h2>إنشاء منشور جديد 🪶</h2>
 
     <form asp-action="CreatePost" method="post" enctype="multipart/form-data">
-        <input hidden asp-for="@Model.AuthorId" value="@CurrentUser.Id" />
+        <input type="hidden" asp-for="AuthorId" value="@CurrentUser?.Id" />
 
         <div class="form-group">
-            <textarea asp-for="Content" class="form-control" placeholder="What's on your mind?" rows="4"></textarea>
+            <textarea asp-for="Content" class="form-control"
+                      placeholder="اكتب ما يجول في خاطرك..."></textarea>
             <span asp-validation-for="Content" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label>Post Visibility</label>
-            <select asp-for="Visibility" class="form-select">
-                <option value="2">Public 🌍</option>
-                <option value="1">Friends 👥</option>
-                <option value="3">Only Me 🔒</option>
+            <label for="Visibility">من يمكنه رؤية هذا المنشور؟</label>
+            <select asp-for="Visibility" class="form-select" id="Visibility">
+                <option value="2">العامة 🌍</option>
+                <option value="1">الأصدقاء 👥</option>
+                <option value="3">أنا فقط 🔒</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label>Tag (optional)</label>
-            <input asp-for="Tag" class="form-control" placeholder="#YourTag" />
+            <label for="Tag">الوسم (اختياري)</label>
+            <input asp-for="Tag" class="form-control" id="Tag" placeholder="#وسمك_هنا" />
         </div>
 
         <div class="form-group">
-            <label>Image (optional)</label>
-            <input type="file" name="Picture" class="form-control" accept="image/*" />
+            <label for="Picture">صورة (اختياري)</label>
+            <input type="file" name="Picture" id="Picture" class="form-control" accept="image/*" />
         </div>
 
         <div class="btn-area">
-            <button type="submit" class="btn btn-primary">Post</button>
-            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">نشر ✨</button>
+            <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">إلغاء</a>
         </div>
     </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/CreatePost.css" />
+
 }

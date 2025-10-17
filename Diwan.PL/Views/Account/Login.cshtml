@@ -1,36 +1,44 @@
 ﻿@model Diwan.PL.ViewModels.LoginViewModel
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "تسجيل الدخول";
     Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
-<div class="auth-container">
-    <h2 class="auth-title">Welcome Back To Diwan</h2>
+<div class="outer-background">
+    <div class="login-container">
+        <h1 class="login-title">مرحباً بكم في ديوان</h1>
 
-    <form asp-action="Login">
-        <div class="full-width">
-            <label asp-for="Email">Email</label>
-            <input asp-for="Email" placeholder="Enter your email" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
+        <form asp-action="Login" class="login-form">
+            <div class="form-group">
+                <label asp-for="Email">البريد الإلكتروني</label>
+                <input asp-for="Email" type="email" placeholder="أدخل البريد الإلكتروني" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
 
-        <div class="full-width">
-            <label asp-for="Password">Password</label>
-            <input asp-for="Password" type="password" placeholder="Enter your password" />
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="Password">كلمة المرور</label>
+                <input asp-for="Password" type="password" placeholder="أدخل كلمة المرور" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
 
-        <div class="full-width remember-me">
-            <input asp-for="RememberMe" type="checkbox" />
-            <label asp-for="RememberMe">Remember Me</label>
-        </div>
+            <div class="options-row">
+                <div class="remember-me">
+                    <input asp-for="RememberMe" type="checkbox" id="RememberMe" />
+                    <label for="RememberMe">تذكرني</label>
+                </div>
+                <div class="forgot-password">
+                    <a asp-action="ForgotPassword">هل نسيت كلمة المرور؟</a>
+                </div>
+            </div>
 
-        <button type="submit">Login</button>
 
-        <div class="text-center">
-            <p>Don’t have an account? <a asp-action="Register">Create one</a></p>
-        </div>
-    </form>
+            <button type="submit" class="login-btn">تسجيل الدخول</button>
+
+            <p class="register-text">
+                ليس لديك حساب؟ <a asp-action="Register">قم بإنشاء حساب</a>
+            </p>
+        </form>
+    </div>
 </div>
 
 @section _ValidationScriptsPartial {
@@ -38,8 +46,6 @@
 }
 
 @section AuthSection {
-    <partial name="AuthSection" />
     <link rel="stylesheet" href="~/css/Login.css" />
+    <partial name="AuthSection" />
 }
-
-

@@ -4,253 +4,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ديوان</title>
-
+    <link rel="icon" type="image/x-icon" href="~/Diwan.ico" />
+    <link rel="shortcut icon" href="~/Diwan.ico" />
+    <link rel="apple-touch-icon" href="~/Diwan.ico" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/_Layout.css" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-    <style>
-        @@keyframes ring 
-        {
-            0% {
-                transform: rotate(0);
-            }
-
-            10% {
-                transform: rotate(15deg);
-            }
-
-            20% {
-                transform: rotate(-10deg);
-            }
-
-            30% {
-                transform: rotate(5deg);
-            }
-
-            40% {
-                transform: rotate(-5deg);
-            }
-
-            50% {
-                transform: rotate(0);
-            }
-        }
-
-        .ring {
-            animation: ring 1s ease-in-out infinite;
-            transform-origin: top center;
-        }
-
-        body {
-            background-color: #F5F5F5;
-        }
-
-        .navbar-diwan {
-            background-color: #5D4037;
-        }
-
-            .navbar-diwan .navbar-brand,
-            .navbar-diwan .nav-link {
-                color: #FFFFFF;
-                font-weight: bold;
-            }
-
-                .navbar-diwan .nav-link:hover {
-                    color: #D7CCC8; /* لون بني أفتح عند مرور الماوس */
-                }
-
-            .navbar-diwan .navbar-brand {
-                font-family: 'Times New Roman', Times, serif; /* خط كلاسيكي أدبي */
-                font-size: 1.5rem;
-            }
-
-        .footer-diwan {
-            background-color: #5D4037;
-            color: #E0E0E0;
-        }
-        /* Style for the notification dropdown */
-        .dropdown-menu {
-            min-width: 350px; /* لجعل القائمة المنسدلة أعرض */
-        }
-
-
-
-        /* حاوية التفاعل الرئيسية */
-        .react-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        /* القائمة المنبثقة للتفاعلات (مخفية بشكل افتراضي) */
-        .reaction-palette {
-            display: none;
-            position: absolute;
-            bottom: 100%;
-            left: 0;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 25px;
-            padding: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            margin-bottom: 8px;
-            white-space: nowrap;
-            display: flex; /* اجعلها flex بشكل دائم */
-            gap: 8px;
-            /* ⬇️⬇️⬇️ الجزء الجديد والمهم ⬇️⬇️⬇️ */
-            opacity: 0; /* ابدأ شفافًا */
-            visibility: hidden; /* ابدأ مخفيًا */
-            transform: translateY(10px); /* ابدأ أسفل قليلاً */
-            transition: all 0.2s ease-in-out; /* أضف حركة ناعمة */
-        }
-
-        /* ⬇️⬇️⬇️ القاعدة الأهم ⬇️⬇️⬇️ */
-        /* عند مرور الماوس فوق الحاوية، قم بإظهار القائمة */
-        .react-container:hover .reaction-palette {
-            opacity: 1; /* اجعله ظاهرًا */
-            visibility: visible; /* اجعله مرئيًا */
-            transform: translateY(0); /* ارجعه لمكانه الطبيعي */
-        }
-
-        /* تصميم أيقونة التفاعل */
-        .reaction-icon {
-            border: none;
-            background: none;
-            font-size: 1.8rem;
-            padding: 0;
-            cursor: pointer;
-            transition: transform 0.15s ease-in-out;
-        }
-
-            /* تأثير عند مرور الماوس فوق الأيقونة */
-            .reaction-icon:hover {
-                transform: scale(1.3);
-            }
-
-
-
-
-
-
-        /* ===== تحسين شكل قائمة المنشورات ===== */
-        .posts-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 25px;
-            margin: 30px auto;
-            max-width: 650px; /* جعلها في منتصف الصفحة بعرض مناسب */
-        }
-
-        /* ===== تصميم كرت المنشور ===== */
-        .post-card {
-            background: #ffffff;
-            width: 100%;
-            border-radius: 18px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            padding: 20px 25px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-            .post-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-            }
-
-        /* ===== رأس المنشور ===== */
-        .post-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-
-            .post-header img {
-                border-radius: 50%;
-                width: 50px;
-                height: 50px;
-                object-fit: cover;
-                border: 2px solid #ddd;
-            }
-
-            .post-header h3 {
-                font-size: 1.1rem;
-                margin: 0;
-                color: #3E2723;
-            }
-
-        .post-date {
-            font-size: 0.85rem;
-            color: #8D6E63;
-        }
-
-        /* ===== محتوى المنشور ===== */
-        .post-body p {
-            font-size: 1rem;
-            color: #333;
-            margin-bottom: 10px;
-            white-space: pre-wrap;
-        }
-
-        .post-body img {
-            display: block;
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
-
-        /* ===== التفاعلات والتعليقات ===== */
-        .post-footer {
-            border-top: 1px solid #eee;
-            margin-top: 10px;
-            padding-top: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: flex-start;
-            align-items: center;
-        }
-
-        .reaction-summary {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .reaction-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.9rem;
-            color: #555;
-        }
-
-        /* ===== أزرار التفاعل والتعليق ===== */
-        .react-container .btn,
-        .comment-button,
-        .view-comments-button {
-            font-size: 0.9rem;
-            border-radius: 25px;
-            padding: 6px 14px;
-            transition: background 0.2s;
-        }
-
-            .react-container .btn:hover,
-            .comment-button:hover,
-            .view-comments-button:hover {
-                background-color: #f1f1f1;
-            }
-
-        /* ===== النص في حالة عدم وجود منشورات ===== */
-        .no-content {
-            text-align: center;
-            margin-top: 50px;
-            color: #6d4c41;
-        }
-
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Cairo:wght@400;600;700&family=Noto+Naskh+Arabic&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -265,22 +28,18 @@
                 </button>
                 <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">الرئيسية</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Profile" asp-action="Profile">ملفي الشخصي</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Friendship" asp-action="Friends">أصدقائي</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Friendship" asp-action="AddFriend">بحث عن أصدقاء</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Account" asp-action="SignOut">تسجيل خروج</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">الرئيسية</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Profile" asp-action="Profile">ملفي الشخصي</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Friendship" asp-action="Friends">أصدقائي</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Friendship" asp-action="AddFriend">بحث عن أصدقاء</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="SignOut">تسجيل خروج</a></li>
                     </ul>
+
+                    <button id="theme-toggle" class="btn btn-light border-0 d-flex align-items-center gap-2">
+                        <i id="theme-icon" class="fas fa-moon"></i>
+                        <span id="theme-label">الوضع الداكن</span>
+                    </button>
+
 
                     <ul class="navbar-nav">
                         @if (User.Identity is { IsAuthenticated: true })
@@ -290,7 +49,6 @@
                                     <i class="fas fa-user-friends"></i>
                                 </a>
                             </li>
-
                             <li class="nav-item dropdown">
                                 @if (ViewData["HaveNotifications"] is bool Have && Have == true)
                                 {
@@ -313,13 +71,12 @@
                                 </ul>
                             </li>
                         }
-
-                        @* <partial name="_LoginPartial" /> *@
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -342,7 +99,6 @@
         <script>
             $(document).ready(function () {
                 var isLoaded = false;
-
                 $('#notificationDropdown').on('click', function () {
                     if (!isLoaded) {
                         $.get("/Notification/Notifications", function (data) {
@@ -352,9 +108,11 @@
                     }
                 });
             });
-           
         </script>
     }
+
     @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync("Styles", required: false)
+
 </body>
 </html>

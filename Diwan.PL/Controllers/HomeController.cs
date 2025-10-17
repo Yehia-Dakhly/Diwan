@@ -16,7 +16,7 @@ using System.Diagnostics;
 //+ Add \n in comments
 //+ Hide The Menu of Edit and delete Post if I not the project Author
 //+ Add Default Photo
-// Reaction Appears After Click
+//+ Reaction Appears After Click
 // Remove Notification if the Posts Deleted
 // Loading Posts && Notifications 5 by 5
 // Dark Mode

@@ -63,7 +63,7 @@ namespace Diwan.PL.Controllers
 
                 await _unitOfWork.PostRepository.AddAsync(MappedPost);
                 await _unitOfWork.CompleteAsync();
-                return RedirectToAction("Profile", "User", new { id = Current });
+                return RedirectToAction("Profile", "Profile", new { id = Current });
             }
             return View(Post);
         }
@@ -134,7 +134,7 @@ namespace Diwan.PL.Controllers
                 }
                 _unitOfWork.PostRepository.Delete(Post);
                 await _unitOfWork.CompleteAsync();
-                return RedirectToAction("Profile", "User", new { id = Post.AuthorId });
+                return RedirectToAction("Profile", "Profile", new { id = Post.AuthorId });
             }
             return BadRequest();
         }
@@ -181,8 +181,7 @@ namespace Diwan.PL.Controllers
                 .GroupBy(r => r.ReactionType)
                 .ToDictionary(g => g.Key.ToString(), g => g.Count());
 
-            // Return a JSON object with the updated counts
-            return Ok(new { totalCount = allReactionsForPost.Count(), countsByType });
+            return Json(new { countByType = countsByType });
         }
 
     }

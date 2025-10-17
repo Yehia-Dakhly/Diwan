@@ -26,14 +26,14 @@
                 <span class="post-date">@Model?.UpdatedAt?.ToString("MMM dd, yyyy")</span>
             }
             @{
-                var visibilityLabel = Model.Visibility switch
+                var visibilityLabel = Model?.Visibility switch
                 {
                     Visibility.Public => "عام",
                     Visibility.Friends => "الأصدقاء فقط",
                     Visibility.Private => "خاص",
                     _ => "غير معروف"
                 };
-                var visibilityIcon = Model.Visibility switch
+                var visibilityIcon = Model?.Visibility switch
                 {
                     Visibility.Public => "fas fa-globe",
                     Visibility.Friends => "fas fa-user-friends",
@@ -74,13 +74,15 @@
 
 
     <div class="post-body">
-        <p>@Model?.Content</p>
+        <span style="white-space: pre-line; margin: 0; padding: 0;">
+            @Html.Raw(Model.Content?.TrimStart('\r', '\n'))
+        </span>
 
         @if (!string.IsNullOrEmpty(Model?.PictureURL))
         {
             <img src="~/Files/Posts/@Model.PictureURL"
                  class="rounded post-image"
-                 height="150" width="150"
+                 style="max-width:100%; max-height:600px;"
                  alt="No Image"
                  data-bs-toggle="modal"
                  data-bs-target="#imageModal"
@@ -90,12 +92,12 @@
     <div class="card-footer post-footer">
         <div class="reaction-summary">
             @{
-                var likes = Model.CountByType.GetValueOrDefault(ReactionType.Like);
-                var loves = Model.CountByType.GetValueOrDefault(ReactionType.Love);
-                var hahas = Model.CountByType.GetValueOrDefault(ReactionType.Haha);
-                var wows = Model.CountByType.GetValueOrDefault(ReactionType.Wow);
-                var sads = Model.CountByType.GetValueOrDefault(ReactionType.Sad);
-                var angries = Model.CountByType.GetValueOrDefault(ReactionType.Angry);
+                var likes = Model?.CountByType.GetValueOrDefault(ReactionType.Like);
+                var loves = Model?.CountByType.GetValueOrDefault(ReactionType.Love);
+                var hahas = Model?.CountByType.GetValueOrDefault(ReactionType.Haha);
+                var wows = Model?.CountByType.GetValueOrDefault(ReactionType.Wow);
+                var sads = Model?.CountByType.GetValueOrDefault(ReactionType.Sad);
+                var angries = Model?.CountByType.GetValueOrDefault(ReactionType.Angry);
             }
 
             @if (likes > 0)
@@ -197,7 +199,7 @@
     <script>
         $(document).on('click', '.delete-post', function (e) {
             e.preventDefault();
-            const friendId = $(this).data('id');
+            const postId = $(this).data('id');
 
             if (confirm('هل أنت متأكد أنك تريد حذف هذا المنشور؟')) {
                 $.post('/Post/DeletePost/' + postId)
@@ -213,7 +215,7 @@
 
         $(document).on('click', '.Edit-post', function (e) {
             e.preventDefault();
-            const friendId = $(this).data('id');
+            const postId = $(this).data('id');
 
                 $.post('/Post/EditPost/' + postId)
                     .done(function () {

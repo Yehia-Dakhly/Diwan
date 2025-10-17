@@ -88,7 +88,7 @@ namespace Diwan.PL.Controllers
             };
             await _unitOfWork.NotificationRepository.AddAsync(NewNotification);
             await _unitOfWork.CompleteAsync();
-            return RedirectToAction("Profile", "User", new {id = addresseeId});
+            return RedirectToAction("Profile", "Profile", new {id = addresseeId});
         }
         public async Task<IActionResult> FriendRequests()
         {
@@ -120,7 +120,7 @@ namespace Diwan.PL.Controllers
                     IsRead = false,
                     RecipientUserId = Friendship.RequesterId,
                     NotificationType = DAL.Enums.NotificationType.FriendRequestAccepted,
-                    URL = Url.Action("Profile", "User", new { id = Friendship.AddresseeId })
+                    URL = Url.Action("Profile", "Profile", new { id = Friendship.AddresseeId })
                 };
                 await _unitOfWork.NotificationRepository.AddAsync(NewNotification);
                 await _unitOfWork.CompleteAsync();
@@ -154,8 +154,8 @@ namespace Diwan.PL.Controllers
             var Friendships = await _unitOfWork.FriendshipRepository.FindAsync(F => (F.AddresseeId == CurrentUserId || F.RequesterId == CurrentUserId) && F.Status == FriendRequestStatus.Accepted, includes: [F => F.Addressee, F => F.Requester]);
             if (Friendships is not null)
             {
-                var Friends = Friendships.Select(F => (F.RequesterId == CurrentUserId ? new FriendViewModel() { Id = F.AddresseeId, FullName = $"{F.Addressee.FirstName} {F.Addressee.LastName}", PictureURL = F.Addressee.PictureURL }
-                : new FriendViewModel() { Id = F.RequesterId, FullName = $"{F.Requester.FirstName} {F.Requester.LastName}", PictureURL = F.Requester.PictureURL })).ToList();
+                var Friends = Friendships.Select(F => (F.RequesterId == CurrentUserId ? new FriendViewModel() { Id = F.AddresseeId, FullName = $"{F.Addressee.FirstName} {F.Addressee.LastName}", PictureURL = F.Addressee.PictureURL, Gender = F.Addressee.Gender }
+                : new FriendViewModel() { Id = F.RequesterId, FullName = $"{F.Requester.FirstName} {F.Requester.LastName}", PictureURL = F.Requester.PictureURL, Gender = F.Requester.Gender })).ToList();
                 return View(Friends);
             }
                 return View();

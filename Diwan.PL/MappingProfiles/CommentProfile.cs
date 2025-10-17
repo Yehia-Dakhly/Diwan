@@ -11,7 +11,8 @@ namespace Diwan.PL.MappingProfiles
             CreateMap<Comment, CommentViewModel>()
                 .ForMember(C => C.AuthorId, O=>O.MapFrom(C => C.User.Id))
                 .ForMember(C => C.AuthorName, O => O.MapFrom(C => $"{C.User.FirstName} {C.User.LastName}"))
-                .ForMember(C => C.AuthorPictureUrl, O => O.MapFrom(C => C.User.PictureURL));
+                .ForMember(C => C.AuthorPictureUrl, O => O.MapFrom(C => C.User.PictureURL))
+                .ForMember(C => C.Gender, O => O.MapFrom(P => P.User.Gender));
         }
     }
 }

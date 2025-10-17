@@ -5,7 +5,7 @@
 
 <div class="comment" dir="rtl">
     <div class="comment-content d-flex flex-row">
-        <img src="~/Files/Images/@Model?.AuthorPictureUrl"
+        <img src="~/Files/Images/@(string.IsNullOrEmpty(Model.AuthorPictureUrl) ? (Model.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png") : Model.AuthorPictureUrl)"
              class="rounded-circle me-3 comment-avatar" alt="avatar" />
 
         <div class="comment-main flex-grow-1">
