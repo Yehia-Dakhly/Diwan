@@ -5,6 +5,7 @@ using Diwan.PL.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace Diwan.PL.Controllers
 {
@@ -34,6 +35,7 @@ namespace Diwan.PL.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
+
             var Comment = new Comment()
             {
                 Content = model.Content,

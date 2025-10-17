@@ -8,3 +8,13 @@
     </div>
     <button type="submit" class="btn btn-primary btn-sm">نشر التعليق</button>
 </form>
+
+
+<script>
+    document.querySelector("form").addEventListener("submit", function (e) {
+        const textarea = this.querySelector("textarea");
+        textarea.value = textarea.value
+            .replace(/^\s*(\r?\n)+/, "")   // إزالة الأسطر الفاضية من البداية
+            .replace(/(\r?\n)+\s*$/, "");  // إزالة الأسطر الفاضية من النهاية
+    });
+</script>

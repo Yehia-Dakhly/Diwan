@@ -5,9 +5,9 @@
     @foreach (var notification in Model)
     {
         <li>
-            <a class="dropdown-item d-flex align-items-center p-2" href="@notification.URL">
+            <a class="dropdown-item d-flex align-items-center p-2" asp-action="ReadNotification" asp-route-id="@notification.Id" asp-route-url="@notification.URL" asp-controller="Notification" >
                 <img src="~/Files/Images/@notification.PictureURL" class="rounded-circle me-2" style="width:40px; height:40px; object-fit: cover;" />
-                <div>
+                <div class="p-2 mb-2 rounded" style="@(notification.IsRead ? "" : "background-color: #f2f2f2;")">
                     <small style="font-weight: 500;">@notification.Message</small><br />
                     <small class="text-muted">@notification.CreatedAt.ToShortTimeString()</small>
                 </div>

@@ -6,11 +6,16 @@
 <div class="comment" dir="rtl">
     <div class="comment-content d-flex flex-row">
         <img src="~/Files/Images/@Model?.AuthorPictureUrl"
-             class="rounded-circle ms-3 comment-avatar" alt="avatar" />
+             class="rounded-circle me-3 comment-avatar" alt="avatar" />
+
         <div class="comment-main flex-grow-1">
             <div class="comment-body p-2">
                 <strong>@Model.AuthorName</strong>
-                <p class="mb-0">@Model.Content</p>
+                <span class="comment-text" style="white-space: pre-line; margin: 0; padding: 0;">
+                    @Html.Raw(Model.Content?.TrimStart('\r', '\n'))
+                </span>
+
+
             </div>
 
             <div class="comment-meta d-flex align-items-center mt-1">
@@ -40,11 +45,10 @@
 
 @if (Model.Replies != null && Model.Replies.Any())
 {
-
-        @foreach (var reply in Model.Replies.OrderBy(r => r.CreatedAt))
-        {
-            <div class="comment @(reply.ParentId != null ? "reply" : "")">
-                <partial name="_SingleComment" model="reply" />
-            </div>
-        }
+    @foreach (var reply in Model.Replies.OrderBy(r => r.CreatedAt))
+    {
+        <div class="comment @(reply.ParentId != null ? "reply" : "")">
+            <partial name="_SingleComment" model="reply" />
+        </div>
+    }
 }

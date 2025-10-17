@@ -7,11 +7,21 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-// Dark Mode
-// Loading Posts 5 by 5
-// Authoritize [Admin] -> View Users
+//+ Fix Request Friend From Profile
+//+ Fix View Reations at Profile
+//+ Ensure Comments Number Are Viewed
+//+ View Photos when I click it
+//+ Add Notification Alert
+//+ Read Notification
+//+ Add \n in comments
+//+ Hide The Menu of Edit and delete Post if I not the project Author
+//+ Add Default Photo
 // Reaction Appears After Click
-// Hide The Menu of Edit and delete Post if I not the project Author
+// Remove Notification if the Posts Deleted
+// Loading Posts && Notifications 5 by 5
+// Dark Mode
+// Friends Suggestions
+// Authoritize [Admin] -> View Users
 // -> Private Account
 // -> Groups
 namespace Diwan.PL.Controllers
@@ -36,11 +46,19 @@ namespace Diwan.PL.Controllers
         {
             if (SearchValue is null)
             {
+
                 var Current = _userManager.GetUserId(User);
                 if (Current is null)
                 {
                     return RedirectToAction("Login", "Account");
                 }
+                
+                var HaveNotification = await _unitOfWork.NotificationRepository.FindFirstAsync(N => N.RecipientUserId == Current && N.IsRead == false);
+                if (HaveNotification is not null)
+                    ViewData["HaveNotifications"] = true;
+                else
+                    ViewData["HaveNotifications"] = false;
+
                 var Posts = await _unitOfWork.PostRepository.GetFriendsPostsAsync(Current);
                 var MappedPosts = _mapper.Map<IEnumerable<Post>, IEnumerable<PostViewModel>>(Posts);
                 return View(MappedPosts);

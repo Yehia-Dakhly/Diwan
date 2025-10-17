@@ -10,5 +10,6 @@ namespace Diwan.BLL.Interfaces
     public interface IPostRepository : IGenericRepository<Post>
     {
         Task<IEnumerable<Post>> GetFriendsPostsAsync(string id);
+        Task<IEnumerable<Post>> GetUserPostsAsync(string id);
     }
 }

@@ -27,9 +27,15 @@ namespace Diwan.BLL.Repositories
                          && (F.RequesterId == id || F.AddresseeId == id)
                 ).Select(F => F.RequesterId == id ? F.AddresseeId : F.RequesterId).ToListAsync();
 
-            var Posts = await _diwanDbContext.Posts.Where(P => (P.Visibility != DAL.Enums.Visibility.Private) && Friends.Contains(P.AuthorId) || P.AuthorId == id)
+            var Posts = await _diwanDbContext.Posts.Where(P => (P.Visibility != DAL.Enums.Visibility.Private) && Friends.Contains(P.AuthorId) || P.AuthorId == id || P.Visibility == DAL.Enums.Visibility.Public)
                 .Include(P => P.Author).Include(P => P.Reactions).Include(P => P.Comments).OrderByDescending(P => P.CreatedAt).ToListAsync();
 
+            return Posts;
+        }
+
+        public async Task<IEnumerable<Post>> GetUserPostsAsync(string id)
+        {
+            var Posts = await _diwanDbContext.Posts.Where(P => P.AuthorId == id).Include(P => P.Reactions).Include(P => P.Comments).OrderByDescending(P => P.CreatedAt).ToListAsync();
             return Posts;
         }
     }

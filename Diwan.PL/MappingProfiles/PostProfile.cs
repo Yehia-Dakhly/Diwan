@@ -16,6 +16,7 @@ namespace Diwan.PL.MappingProfiles
                 .ForMember(P => P.CountByType, O => O
                         .MapFrom(P => P.Reactions
                         .GroupBy(P => P.ReactionType).ToDictionary(G => G.Key, G => G.Count())))
+                .ForMember(P => P.Gender, O => O.MapFrom(P => P.Author.Gender))
                 .ReverseMap();
 
             CreateMap<CreatePostViewModel, Post>();

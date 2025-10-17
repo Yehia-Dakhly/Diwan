@@ -16,7 +16,7 @@ namespace Diwan.PL.ViewModels
         public string? Tag { get; set; }
         public required string AuthorId { get; set; }
 
-
+        public Gender? Gender { get; set; }
         public required string FullName { get; set; }
         public string? UserPictureURL { get; set; }
         public Dictionary<ReactionType, int> CountByType { get; set; } = new Dictionary<ReactionType, int>();

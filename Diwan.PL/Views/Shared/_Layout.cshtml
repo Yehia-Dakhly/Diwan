@@ -11,6 +11,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
     <style>
+        @@keyframes ring 
+        {
+            0% {
+                transform: rotate(0);
+            }
+
+            10% {
+                transform: rotate(15deg);
+            }
+
+            20% {
+                transform: rotate(-10deg);
+            }
+
+            30% {
+                transform: rotate(5deg);
+            }
+
+            40% {
+                transform: rotate(-5deg);
+            }
+
+            50% {
+                transform: rotate(0);
+            }
+        }
+
+        .ring {
+            animation: ring 1s ease-in-out infinite;
+            transform-origin: top center;
+        }
+
         body {
             background-color: #F5F5F5;
         }
@@ -237,7 +269,7 @@
                             <a class="nav-link" asp-controller="Home" asp-action="Index">الرئيسية</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="User" asp-action="Profile">ملفي الشخصي</a>
+                            <a class="nav-link" asp-controller="Profile" asp-action="Profile">ملفي الشخصي</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Friendship" asp-action="Friends">أصدقائي</a>
@@ -260,9 +292,22 @@
                             </li>
 
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="الإشعارات">
-                                    <i class="fas fa-bell"></i>
-                                </a>
+                                @if (ViewData["HaveNotifications"] is bool Have && Have == true)
+                                {
+                                    <a class="nav-link" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="الإشعارات">
+                                        <div class="notification-bell position-relative">
+                                            <i class="fas fa-bell fa-lg ring"></i>
+                                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                                        </div>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="الإشعارات">
+                                        <i class="fas fa-bell"></i>
+                                    </a>
+                                }
+
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" id="notificationMenu">
                                     <li class="text-center p-2"><div class="spinner-border spinner-border-sm" role="status"></div></li>
                                 </ul>
@@ -296,17 +341,13 @@
     {
         <script>
             $(document).ready(function () {
-                var isLoaded = false; // متغير لتتبع ما إذا كانت الإشعارات قد تم تحميلها
+                var isLoaded = false;
 
-                // عندما يتم الضغط على أيقونة الجرس
                 $('#notificationDropdown').on('click', function () {
-                    // قم بالتحميل فقط إذا لم يتم تحميلها من قبل
                     if (!isLoaded) {
-                        // أرسل طلب GET إلى الـ Action الخاص بالإشعارات
-                        $.get("/User/Notification", function (data) {
-                            // ضع الـ HTML الذي تم إرجاعه داخل القائمة المنسدلة
+                        $.get("/Notification/Notifications", function (data) {
                             $("#notificationMenu").html(data);
-                            isLoaded = true; // ضع علامة بأنها تم تحميلها
+                            isLoaded = true;
                         });
                     }
                 });
