@@ -67,11 +67,11 @@
 </div>
 @if (Model is not null && Model.Any())
 {
-    <div class="posts-container">
-        @foreach (var post in Model)
-        {
-            <partial name="PostPartialView" model="post" />
-        }
+    <div class="posts-container" id="posts-container">
+        @await Html.PartialAsync("_PostListPartial", Model)
+    </div>
+    <div id="loading" style="display:none;text-align:center;">
+        <p>جاري تحميل المزيد...</p>
     </div>
 }
 else
@@ -200,6 +200,38 @@ else
                     });
                 }
             });
+        });
+
+
+
+
+        let currentPage = 1;
+        const pageSize = 5;
+        let isLoading = false;
+        let noMorePosts = false;
+
+        async function loadMorePosts() {
+            if (isLoading || noMorePosts) return;
+            isLoading = true;
+            document.getElementById("loading").style.display = "block";
+
+            const res = await fetch(`/Home/LoadFriendsPosts?page=${++currentPage}&pageSize=${pageSize}`);
+            const html = await res.text();
+
+            if (html.trim() === "") {
+                noMorePosts = true;
+            } else {
+                document.getElementById("posts-container").insertAdjacentHTML("beforeend", html);
+            }
+
+            document.getElementById("loading").style.display = "none";
+            isLoading = false;
+        }
+
+        window.addEventListener("scroll", () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                loadMorePosts();
+            }
         });
     </script>
 }

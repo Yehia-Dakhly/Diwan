@@ -41,6 +41,32 @@ namespace Diwan.PL.Controllers
             _userManager = userManager;
             _mapper = mapper;
         }
+        [HttpGet]
+        public async Task<IActionResult> LoadFriendsPosts(int page = 1, int pageSize = 5)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            if (currentUserId == null)
+                return Unauthorized();
+
+            var posts = await _unitOfWork.PostRepository.GetFriendsPostsAsync(currentUserId);
+
+            var pagedPosts = posts.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var mapped = _mapper.Map<IEnumerable<PostViewModel>>(pagedPosts);
+
+            return PartialView("_PostListPartial", mapped);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LoadUserPosts(string id, int page = 1, int pageSize = 5)
+        {
+            var posts = await _unitOfWork.PostRepository.GetUserPostsAsync(id);
+            var pagedPosts = posts.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var mapped = _mapper.Map<IEnumerable<PostViewModel>>(pagedPosts);
+
+            return PartialView("_PostListPartial", mapped);
+        }
 
         public async Task<IActionResult> Index(string? SearchValue)
         {
@@ -60,7 +86,10 @@ namespace Diwan.PL.Controllers
                     ViewData["HaveNotifications"] = false;
 
                 var Posts = await _unitOfWork.PostRepository.GetFriendsPostsAsync(Current);
-                var MappedPosts = _mapper.Map<IEnumerable<Post>, IEnumerable<PostViewModel>>(Posts);
+
+                var FirstPosts = Posts.Take(5);
+                var MappedPosts = _mapper.Map<IEnumerable<PostViewModel>>(FirstPosts);
+
                 return View(MappedPosts);
             }
             else

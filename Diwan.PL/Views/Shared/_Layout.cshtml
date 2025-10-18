@@ -10,11 +10,33 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/_Layout.css" />
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-
     <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Cairo:wght@400;600;700&family=Noto+Naskh+Arabic&display=swap" rel="stylesheet">
+
+    <style>
+        /* تنعيم شكل الـ Scroll */
+        #notify-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #notify-container::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 4px;
+        }
+
+            #notify-container::-webkit-scrollbar-thumb:hover {
+                background-color: #666;
+            }
+
+        #notify-container {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            width: 100%;
+        }
+    </style>
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark navbar-diwan border-bottom box-shadow mb-3">
@@ -22,10 +44,11 @@
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="fas fa-feather-alt"></i> ديوان
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">الرئيسية</a></li>
@@ -40,7 +63,6 @@
                         <span id="theme-label">الوضع الداكن</span>
                     </button>
 
-
                     <ul class="navbar-nav">
                         @if (User.Identity is { IsAuthenticated: true })
                         {
@@ -49,10 +71,13 @@
                                     <i class="fas fa-user-friends"></i>
                                 </a>
                             </li>
+
+                            <!-- 🔔 الإشعارات -->
                             <li class="nav-item dropdown">
                                 @if (ViewData["HaveNotifications"] is bool Have && Have == true)
                                 {
-                                    <a class="nav-link" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="الإشعارات">
+                                    <a class="nav-link" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown"
+                                       aria-expanded="false" title="الإشعارات">
                                         <div class="notification-bell position-relative">
                                             <i class="fas fa-bell fa-lg ring"></i>
                                             <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
@@ -61,13 +86,21 @@
                                 }
                                 else
                                 {
-                                    <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="الإشعارات">
+                                    <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false" title="الإشعارات">
                                         <i class="fas fa-bell"></i>
                                     </a>
                                 }
 
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" id="notificationMenu">
-                                    <li class="text-center p-2"><div class="spinner-border spinner-border-sm" role="status"></div></li>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown"
+                                    id="notificationMenu" style="width: 320px; padding: 0;">
+
+                                    <div id="notify-container">
+                                        <ul id="notifications-list" class="list-unstyled mb-0"></ul>
+                                        <div id="loading" class="text-center py-2" style="display:none;">
+                                            <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                                        </div>
+                                    </div>
                                 </ul>
                             </li>
                         }
@@ -94,25 +127,68 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @if (User.Identity is { IsAuthenticated: true })
     {
         <script>
-            $(document).ready(function () {
-                var isLoaded = false;
-                $('#notificationDropdown').on('click', function () {
-                    if (!isLoaded) {
-                        $.get("/Notification/Notifications", function (data) {
-                            $("#notificationMenu").html(data);
-                            isLoaded = true;
-                        });
+            document.addEventListener("DOMContentLoaded", function () {
+                const dropdown = document.getElementById("notificationDropdown");
+                const container = document.getElementById("notify-container");
+                const list = document.getElementById("notifications-list");
+                const loading = document.getElementById("loading");
+
+                let page = 1;
+                const pageSize = 5;
+                let isLoading = false;
+                let allLoaded = false;
+                let initialized = false;
+
+                // تحميل أول مرة عند فتح القائمة
+                dropdown.addEventListener("click", async () => {
+                    if (initialized) return;
+                    await loadNotifications();
+                    initialized = true;
+                });
+
+                // تحميل عند التمرير لأسفل
+                container.addEventListener("scroll", async () => {
+                    if (container.scrollTop + container.clientHeight >= container.scrollHeight - 5) {
+                        await loadNotifications();
                     }
                 });
+
+                async function loadNotifications() {
+                    if (isLoading || allLoaded) return;
+                    isLoading = true;
+                    loading.style.display = "block";
+
+                    try {
+                        const res = await fetch(`/Notification/LoadNotifications?page=${page}&pageSize=${pageSize}`);
+                        if (res.ok) {
+                            const html = await res.text();
+                            if (html.trim() === "") {
+                                allLoaded = true;
+                            } else {
+                                list.insertAdjacentHTML("beforeend", html);
+                                page++;
+                            }
+                        } else {
+                            list.insertAdjacentHTML("beforeend",
+                                `<li class="dropdown-item text-danger text-center">⚠️ حدث خطأ أثناء التحميل</li>`);
+                        }
+                    } catch {
+                        list.insertAdjacentHTML("beforeend",
+                            `<li class="dropdown-item text-danger text-center">🚫 تعذر الاتصال بالخادم</li>`);
+                    }
+
+                    loading.style.display = "none";
+                    isLoading = false;
+                }
             });
         </script>
     }
 
     @await RenderSectionAsync("Scripts", required: false)
     @await RenderSectionAsync("Styles", required: false)
-
 </body>
 </html>

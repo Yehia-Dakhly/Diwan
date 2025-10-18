@@ -1,0 +1,6 @@
+﻿@model IEnumerable<PostViewModel>
+
+@foreach (var post in Model)
+{
+    <partial name="PostPartialView" model="post" />
+}

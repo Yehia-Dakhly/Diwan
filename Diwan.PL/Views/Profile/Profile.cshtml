@@ -1,16 +1,25 @@
 ﻿@model Diwan.PL.ViewModels.UserProfileViewModel
 @using Diwan.DAL.Enums
-
 @{
-    ViewData["Title"] = Model.FullName;
+    ViewData["Title"] = (Model.FullName);
 }
 
 <div class="profile-container">
     <div class="profile-header shadow-sm position-relative">
         <img src="~/Files/Images/@Model.CoverPicURL" alt="Cover Photo" class="cover-photo" />
-        <img src="~/Files/Images/@(string.IsNullOrEmpty(Model.PictureURL)
-                         ? (Model.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png")
-                         : Model.PictureURL)" alt="Profile Picture" class="profile-picture" />
+        <img src="@Url.Content("~/Files/Images/" + (string.IsNullOrEmpty(Model.PictureURL)
+                                   ? (Model.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png")
+                                   : Model.PictureURL))"
+             alt="Profile Picture"
+             class="profile-picture"
+             data-bs-toggle="modal"
+             data-bs-target="#imageModal"
+             data-image-url='@Url.Content("~/Files/Images/" + (string.IsNullOrEmpty(Model.PictureURL)
+                                       ? (Model.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png")
+                                       : Model.PictureURL))' />
+
+
+
     </div>
 
     <div class="profile-info">
@@ -63,10 +72,9 @@
         <h3 class="section-title">منشورات @Model.FullName</h3>
         @if (Model.Posts != null && Model.Posts.Any())
         {
-            @foreach (var post in Model.Posts)
-            {
-                <partial name="PostPartialView" model="post" />
-            }
+            <div class="posts-container" id="posts-container">
+                @await Html.PartialAsync("_PostListPartial", Model.Posts)
+            </div>
         }
         else
         {
@@ -75,6 +83,30 @@
     </div>
 </div>
 
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded shadow" alt="Expanded image">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    <script>
+        $(function () {
+            // Modal show: نحصل على data-image-url من الزر الذي فتح المودال ثم نضعها في img
+            $('#imageModal').on('show.bs.modal', function (event) {
+                var trigger = $(event.relatedTarget); // الزر الذي ضغط عليه المستخدم
+                var imageUrl = trigger.data('image-url');
+                $('#modalImage').attr('src', imageUrl || '');
+            });
+
+            // Modal hidden: نفضي src عشان نحرر الذاكرة
+            $('#imageModal').on('hidden.bs.modal', function () {
+                $('#modalImage').attr('src', '');
+            });
+</script>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
@@ -197,6 +229,34 @@
                     });
                 }
             });
+        });
+
+
+
+           let currentPage = 1;
+        const pageSize = 5;
+        let isLoading = false;
+
+        async function loadMorePosts() {
+            if (isLoading) return;
+            isLoading = true;
+            currentPage++;
+
+            const container = document.getElementById("posts-container");
+
+            const userId = '@Model.Id';
+            const res = await fetch(`/Home/LoadUserPosts?id=${userId}&page=${currentPage}&pageSize=${pageSize}`);
+
+            const html = await res.text();
+
+            container.insertAdjacentHTML("beforeend", html);
+            isLoading = false;
+        }
+
+        window.addEventListener("scroll", () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                loadMorePosts();
+            }
         });
     </script>
 }
