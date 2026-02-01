@@ -1,0 +1,13 @@
+﻿@model IEnumerable<CommentViewModel>
+
+@if (Model != null && Model.Any())
+{
+    @foreach (var comment in Model)
+    {
+        <partial name="_SingleComment" model="comment" />
+    }
+}
+else
+{
+    <p class="text-muted text-center p-3">لا توجد تعليقات. كن أول من يعلق!</p>
+}

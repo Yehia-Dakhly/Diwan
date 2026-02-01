@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "تم تأكيد البريد الإلكتروني";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="email-confirmed-container fade-in">
+    <div class="icon-container success">
+        <i class="fas fa-check-circle"></i>
+    </div>
+
+    <h2 class="title">تم تأكيد بريدك الإلكتروني بنجاح!</h2>
+    <p class="message">
+        يمكنك الآن تسجيل الدخول إلى حسابك والبدء في استخدام ديوان.
+    </p>
+
+    <a asp-action="Login" asp-controller="Account" class="btn btn-primary">تسجيل الدخول</a>
+</div>
+@section _ValidationScriptsPartial {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@section AuthSection {
+    <link rel="stylesheet" href="~/css/EmailConfirmed.css" />
+    <partial name="AuthSection" />
+}

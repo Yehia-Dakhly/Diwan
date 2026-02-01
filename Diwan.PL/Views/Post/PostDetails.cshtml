@@ -1,0 +1,111 @@
+﻿@model PostViewModel
+@{
+    ViewData["Title"] = "PostDetails";
+}
+
+@if (Model is not null)
+{
+    <div class="posts-container">
+        <partial name="PostPartialView" model="Model" />
+    </div>
+}
+else
+{
+    <h2 class="no-content">There's no content</h2>
+}
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            console.log("Page is ready. All scripts are now running.");
+
+            $(document).on('click', '.comment-button', function () {
+                console.log("Comment button clicked!");
+                var postId = $(this).data('postid');
+                var container = $('#comment-form-container-' + postId);
+                var isVisible = container.is(':visible');
+
+                $('.comment-form-container').hide().html('');
+
+                if (!isVisible) {
+                    container.html('<div class="text-center p-3">Loading...</div>').show();
+                    $.get("/Comment/CreateComment?id=" + postId, function (data) {
+                        container.html(data);
+                    }).fail(function() {
+                        container.html('<p class="text-danger text-center">Failed to load form.</p>');
+                    });
+                }
+            });
+
+            $(document).on('click', '.view-comments-button', function () {
+                console.log("View comments button clicked!");
+                var postId = $(this).data('postid');
+                var container = $('#comments-container-' + postId);
+
+                if (container.is(':visible')) {
+                    container.slideUp().html('');
+                } else {
+                    container.html('<div class="text-center p-3"><div class="spinner-border spinner-border-sm"></div></div>').slideDown();
+                    $.get("/Comment/_GetCommentsPartial?postId=" + postId, function (data) {
+                        container.html(data);
+                    }).fail(function() {
+                        container.html('<p class="text-danger text-center">Failed to load comments.</p>');
+                    });
+                }
+            });
+
+            $(document).on('click', '.reaction-icon', function (e) {
+                e.preventDefault();
+                console.log("Reaction icon clicked!");
+                var button = $(this);
+                var postId = button.data('postid');
+                var reactionTypeString = button.data('reactiontype');
+                var reactionTypeEnum = getReactionTypeEnum(reactionTypeString);
+
+                $.ajax({
+                    url: '/Post/ToggleReaction',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ postId: postId, reactionType: reactionTypeEnum }),
+                    success: function (response) {
+                        console.log("Reaction success:", response);
+                    },
+                    error: function (xhr) {
+                        console.error("Reaction failed:", xhr.responseText);
+                    }
+                });
+            });
+
+            function getReactionTypeEnum(reactionName) {
+                switch (reactionName) {
+                    case 'Like': return 1;
+                    case 'Love': return 2;
+                    case 'Haha': return 3;
+                    case 'Wow': return 4;
+                    case 'Sad': return 5;
+                    case 'Angry': return 6;
+                    default: return 0;
+                }
+            }
+
+        });
+        $(document).ready(function () {
+
+            $(document).on('click', '.reply-button', function () {
+                var commentId = $(this).data('commentid');
+                var postId = $(this).data('postid');
+                var container = $('#reply-form-container-' + commentId);
+                var isVisible = container.is(':visible');
+
+                $('.reply-form-container').hide().html('');
+
+                if (!isVisible) {
+                    container.html('<div class="spinner-border spinner-border-sm"></div>').show();
+
+                    $.get(`/Comment/ReplyComment?postId=${postId}&parentId=${commentId}`, function (data) {
+                        container.html(data);
+                    });
+                }
+            });
+        });
+    </script>
+}

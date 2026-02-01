@@ -1,0 +1,56 @@
+﻿@using Diwan.DAL.Models
+@using Microsoft.AspNetCore.Identity
+@model CreatePostViewModel
+@inject UserManager<DiwanUser> UserManager
+
+@{
+    var CurrentUser = await UserManager.GetUserAsync(User);
+    ViewData["Title"] = "إنشاء منشور جديد";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="create-post-container">
+    <h2>إنشاء منشور جديد 🪶</h2>
+
+    <form asp-action="CreatePost" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="AuthorId" value="@CurrentUser?.Id" />
+
+        <div class="form-group">
+            <textarea asp-for="Content" class="form-control"
+                      placeholder="اكتب ما يجول في خاطرك..."></textarea>
+            <span asp-validation-for="Content" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="Visibility">من يمكنه رؤية هذا المنشور؟</label>
+            <select asp-for="Visibility" class="form-select" id="Visibility">
+                <option value="2">العامة 🌍</option>
+                <option value="1">الأصدقاء 👥</option>
+                <option value="3">أنا فقط 🔒</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="Tag">الوسم (اختياري)</label>
+            <input asp-for="Tag" class="form-control" id="Tag" placeholder="#وسمك_هنا" />
+        </div>
+
+        <div class="form-group">
+            <label for="Picture">صورة (اختياري)</label>
+            <input type="file" name="Picture" id="Picture" class="form-control" accept="image/*" />
+        </div>
+
+        <div class="btn-area">
+            <button type="submit" class="btn btn-primary">نشر ✨</button>
+            <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">إلغاء</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/CreatePost.css" />
+
+}

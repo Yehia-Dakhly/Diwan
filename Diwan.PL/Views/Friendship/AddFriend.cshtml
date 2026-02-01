@@ -1,0 +1,98 @@
+﻿@model IEnumerable<DiwanUserViewModel>
+@{
+    ViewData["Title"] = "البحث عن الأصدقاء";
+}
+
+<div class="container mt-4 find-friends-page text-end" dir="rtl">
+    <h1 class="fw-bold text-center mb-4 page-title">
+        <i class="bi bi-people-fill me-2"></i>البحث عن الأصدقاء
+    </h1>
+
+    <div class="search-box mx-auto mb-5 p-4 rounded-4 shadow-sm">
+        <form asp-action="AddFriend" method="get" class="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-2">
+            <input type="text" name="UserName" class="form-control search-input text-center" placeholder="ابحث بالبريد الإلكتروني..." />
+            <button type="submit" class="btn btn-brown px-4 py-2">بحث</button>
+        </form>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <h4 class="fw-semibold mb-4 text-secondary">نتائج البحث</h4>
+
+        <div class="row">
+            @foreach (var user in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card user-card shadow-sm border-0 rounded-4 h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <a asp-controller="Profile" asp-action="Profile" asp-route-id="@user.Id">
+                                <img src="~/Files/Images/@(string.IsNullOrEmpty(user.PictureURL)
+                                                                         ? (user.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png")
+                                                                         : user.PictureURL)"
+                             alt="صورة المستخدم" class="rounded-circle ms-3 border user-img" />
+                    </a>
+
+                            <div class="flex-grow-1">
+                                <a asp-controller="Profile" asp-action="Profile" asp-route-id="@user.Id" class="text-decoration-none">
+                                    <h5 class="card-title mb-1 fw-bold user-name">@user.FirstName @user.LastName</h5>
+                                </a>
+
+                                <p class="card-text bio-text mb-3">@user.Bio</p>
+
+                        @if (user.FriendshipStatus == null || user.FriendshipStatus == FriendRequestStatus.Unknown || user.FriendshipStatus == FriendRequestStatus.Declined)
+                                {
+                                    <form asp-action="RequestFriend" method="post">
+                                        <input type="hidden" name="addresseeId" value="@user.Id" />
+                                        <button type="submit" class="btn btn-sm btn-success px-3">
+                                            <i class="bi bi-person-plus-fill ms-1"></i>إضافة صديق
+                                        </button>
+                                    </form>
+                                }
+                                else if (user.FriendshipStatus == FriendRequestStatus.Pending)
+                                {
+                                    if (user.IsFriendshipInitiator)
+                                    {
+                                        <button class="btn btn-sm btn-secondary" disabled>
+                                            <i class="bi bi-hourglass-split ms-1"></i>تم إرسال الطلب
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="AcceptRequest" asp-controller="Friendship" asp-route-id="@user.Id" class="btn btn-sm btn-info text-white">
+                                            <i class="bi bi-check2-circle ms-1"></i>الرد على الطلب
+                                        </a>
+                                    }
+                                }
+                                else if (user.FriendshipStatus == FriendRequestStatus.Accepted)
+                                {
+                                    <span class="badge bg-primary p-2">
+                                        <i class="bi bi-heart-fill ms-1"></i>أصدقاء
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger p-2">محظور</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center mt-5 empty-result">
+            <i class="bi bi-search-heart text-muted" style="font-size:3rem;"></i>
+            <p class="text-muted mt-3 fs-5 poetic-line">
+                لم نجد من تبحث عنه... <br />ربما ينتظرك في بيتٍ من الشعر.
+            </p>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Cairo:wght@400;600;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/FindFriends.css" />
+}

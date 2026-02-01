@@ -1,0 +1,64 @@
+﻿@model EditPostViewModel
+@{
+    ViewData["Title"] = "تعديل المنشور";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // غيّر لو الصفحة داخل Layout آخر
+}
+
+<div class="edit-post-container">
+    <h2>تعديل المنشور🪶</h2>
+
+    <form asp-action="EditPost" method="post" enctype="multipart/form-data">
+        <input asp-for="Id" type="hidden" />
+        <input asp-for="AuthorId" type="hidden" />
+
+        <div class="form-group">
+            <label asp-for="Content">محتوى المنشور</label>
+            <textarea asp-for="Content" class="form-control" rows="5"
+                      placeholder="حرر النص هنا..."></textarea>
+            <span asp-validation-for="Content" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Tag">الوسم (اختياري)</label>
+            <input asp-for="Tag" class="form-control" placeholder="#وسمك_هنا" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Visibility">من يمكنه رؤية المنشور؟</label>
+            <select asp-for="Visibility" class="form-select"
+                    asp-items="Html.GetEnumSelectList<Visibility>()"></select>
+        </div>
+
+        <div class="form-group current-image">
+            <label>الصورة الحالية</label><br />
+            @if (!string.IsNullOrEmpty(Model.PictureURL))
+            {
+                <img src="~/Images/@Model.PictureURL"
+                     alt="Post Picture"
+                     class="post-img" />
+            }
+            else
+            {
+                <p class="no-image">لا توجد صورة حالياً</p>
+            }
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Picture">تحديث الصورة (اختياري)</label>
+            <input asp-for="Picture" class="form-control" type="file" accept="image/*" />
+        </div>
+
+        <div class="btn-area">
+            <button type="submit" class="btn btn-primary">💾 حفظ التغييرات</button>
+            <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">إلغاء</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/EditPost.css" />
+
+}

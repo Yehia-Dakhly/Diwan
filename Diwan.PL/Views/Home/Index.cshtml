@@ -1,0 +1,237 @@
+﻿@model IEnumerable<PostViewModel>
+@{
+    ViewData["Title"] = "القائمة الرئيسية";
+}
+<style>
+    .posts-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-width: 600px;
+        margin: auto;
+    }
+
+    .post-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .post-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .profile-pic {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .post-image {
+        width: 100%;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+
+    .post-footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .no-content {
+        text-align: center;
+        margin-top: 50px;
+        color: gray;
+    }
+
+    .btn-success:hover {
+        background-color: #5a3c2d !important;
+        transform: scale(1.05);
+    }
+</style>
+<div class="text-center my-4">
+    <a asp-controller="Post" asp-action="CreatePost"
+       class="btn btn-success shadow-sm px-4 py-2 d-inline-flex align-items-center rounded-pill"
+       style="background-color:#3b2b25; border:none; transition: all 0.3s ease;">
+        <i class="fas fa-feather-alt ms-2"></i>
+        أضف منشورًا جديدًا
+    </a>
+</div>
+@if (Model is not null && Model.Any())
+{
+    <div class="posts-container" id="posts-container">
+        @await Html.PartialAsync("_PostListPartial", Model)
+    </div>
+    <div id="loading" style="display:none;text-align:center;">
+        <p>جاري تحميل المزيد...</p>
+    </div>
+}
+else
+{
+    <h2 class="no-content">There's no content</h2>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            console.log("Page is ready. All scripts are now running.");
+
+                    $(document).on('click', '.comment-button', function () {
+            console.log("Comment button clicked!");
+            var postId = $(this).data('postid');
+            var container = $('#comment-form-container-' + postId);
+
+            if (container.is(':visible')) {
+                container.slideUp(200, function () {
+                    container.html('');
+                });
+                return;
+            }
+
+            $('.comment-form-container').hide().html('');
+            container.html('<div class="text-center p-3">Loading...</div>').slideDown();
+
+            $.get("/Comment/CreateComment?id=" + postId, function (data) {
+                container.html(data);
+            }).fail(function () {
+                container.html('<p class="text-danger text-center">Failed to load form.</p>');
+            });
+        });
+
+            $(document).on('click', '.view-comments-button', function () {
+                console.log("View comments button clicked!");
+                var postId = $(this).data('postid');
+                var container = $('#comments-container-' + postId);
+
+                if (container.is(':visible')) {
+                    container.slideUp().html('');
+                } else {
+                    container.html('<div class="text-center p-3"><div class="spinner-border spinner-border-sm"></div></div>').slideDown();
+                    $.get("/Comment/_GetCommentsPartial?postId=" + postId, function (data) {
+                        container.html(data);
+                    }).fail(function() {
+                        container.html('<p class="text-danger text-center">Failed to load comments.</p>');
+                    });
+                }
+            });
+
+                    $(document).on('click', '.reaction-icon', function (e) {
+            e.preventDefault();
+            var button = $(this);
+            var postId = button.data('postid');
+            var reactionTypeString = button.data('reactiontype');
+            var reactionTypeEnum = getReactionTypeEnum(reactionTypeString);
+
+            $.ajax({
+                url: '/Post/ToggleReaction',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ postId: postId, reactionType: reactionTypeEnum }),
+                success: function (response) {
+                    console.log("Reaction success:", response);
+
+
+                    if (response && response.countByType) {
+                        const postCard = button.closest('.post-card');
+                        const reactionSummary = postCard.find('.reaction-summary');
+                        reactionSummary.empty();
+
+                        const icons = {
+                            Like: '<i class="fas fa-thumbs-up text-primary"></i>',
+                            Love: '<i class="fas fa-heart text-danger"></i>',
+                            Haha: '<i class="fas fa-laugh-squint text-warning"></i>',
+                            Wow: '<i class="fas fa-surprise text-info"></i>',
+                            Sad: '<i class="fas fa-sad-tear text-info"></i>',
+                            Angry: '<i class="fas fa-angry text-danger"></i>'
+                        };
+
+                        for (const [type, count] of Object.entries(response.countByType)) {
+                            if (count > 0) {
+                                reactionSummary.append(
+                                    `<div class="reaction-item">${icons[type]} <span>${count}</span></div>`
+                                );
+                            }
+                        }
+                    }
+                },
+                error: function (xhr) {
+                    console.error("Reaction failed:", xhr.responseText);
+                }
+            });
+        });
+
+
+            function getReactionTypeEnum(reactionName) {
+                switch (reactionName) {
+                    case 'Like': return 1;
+                    case 'Love': return 2;
+                    case 'Haha': return 3;
+                    case 'Wow': return 4;
+                    case 'Sad': return 5;
+                    case 'Angry': return 6;
+                    default: return 0;
+                }
+            }
+
+        });
+        $(document).ready(function () {
+
+            $(document).on('click', '.reply-button', function () {
+                var commentId = $(this).data('commentid');
+                var postId = $(this).data('postid');
+                var container = $('#reply-form-container-' + commentId);
+                var isVisible = container.is(':visible');
+
+                $('.reply-form-container').hide().html('');
+
+                if (!isVisible) {
+                    container.html('<div class="spinner-border spinner-border-sm"></div>').show();
+
+                    $.get(`/Comment/ReplyComment?postId=${postId}&parentId=${commentId}`, function (data) {
+                        container.html(data);
+                    });
+                }
+            });
+        });
+
+
+
+
+        let currentPage = 1;
+        const pageSize = 5;
+        let isLoading = false;
+        let noMorePosts = false;
+
+        async function loadMorePosts() {
+            if (isLoading || noMorePosts) return;
+            isLoading = true;
+            document.getElementById("loading").style.display = "block";
+
+            const res = await fetch(`/Home/LoadFriendsPosts?page=${++currentPage}&pageSize=${pageSize}`);
+            const html = await res.text();
+
+            if (html.trim() === "") {
+                noMorePosts = true;
+            } else {
+                document.getElementById("posts-container").insertAdjacentHTML("beforeend", html);
+            }
+
+            document.getElementById("loading").style.display = "none";
+            isLoading = false;
+        }
+
+        window.addEventListener("scroll", () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                loadMorePosts();
+            }
+        });
+    </script>
+}

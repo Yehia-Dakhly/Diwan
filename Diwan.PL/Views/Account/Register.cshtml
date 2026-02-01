@@ -1,0 +1,93 @@
+﻿@model Diwan.PL.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "إنشاء حساب جديد";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="outer-background">
+    <div class="register-container">
+        <h1 class="register-title">إنشاء حساب جديد</h1>
+
+        <form asp-action="Register" enctype="multipart/form-data" class="register-form">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="FName">الاسم الأول</label>
+                    <input asp-for="FName" placeholder="أدخل اسمك الأول" />
+                    <span asp-validation-for="FName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="LName">الاسم الأخير</label>
+                    <input asp-for="LName" placeholder="أدخل اسمك الأخير" />
+                    <span asp-validation-for="LName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="Email">البريد الإلكتروني</label>
+                    <input asp-for="Email" placeholder="أدخل بريدك الإلكتروني" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="PhoneNumber">رقم الهاتف</label>
+                    <input asp-for="PhoneNumber" placeholder="أدخل رقم هاتفك" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="DateOfBirth">تاريخ الميلاد</label>
+                    <input asp-for="DateOfBirth" type="date" />
+                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="Gender">النوع</label>
+                    <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()">
+                        <option value="">-- اختر النوع --</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="Password">كلمة المرور</label>
+                    <input asp-for="Password" type="password" placeholder="أدخل كلمة المرور" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="ComfirmPassword">تأكيد كلمة المرور</label>
+                    <input asp-for="ComfirmPassword" type="password" placeholder="أعد إدخال كلمة المرور" />
+                    <span asp-validation-for="ComfirmPassword" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-row single-row">
+                <div class="agree-section">
+                    <input asp-for="IsAgree" type="checkbox" id="IsAgree" />
+                    <label for="IsAgree">أوافق على الشروط والأحكام</label>
+                </div>
+            </div>
+
+            <button type="submit" class="register-btn">تسجيل</button>
+
+            <p class="login-link">هل لديك حساب بالفعل؟ <a asp-action="Login">سجّل الدخول هنا</a></p>
+
+        </form>
+    </div>
+</div>
+
+@section _ValidationScriptsPartial {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@section AuthSection {
+    <link rel="stylesheet" href="~/css/Register.css" />
+    <partial name="AuthSection" />
+}

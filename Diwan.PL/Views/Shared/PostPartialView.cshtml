@@ -1,0 +1,232 @@
+﻿@using Diwan.DAL.Models
+@using Microsoft.AspNetCore.Identity
+@model PostViewModel
+@inject UserManager<DiwanUser> userManager
+<div class="post-card">
+
+    <div class="post-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <a asp-action="Profile" asp-controller="Profile" asp-route-id="@Model.AuthorId">
+                <img src="~/Files/Images/@(string.IsNullOrEmpty(Model.UserPictureURL) ? (Model.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png") : Model.UserPictureURL)"
+                     alt="User Image"
+                     class="rounded-circle me-2"
+                     width="45"
+                     height="45">
+            </a>
+            <div>
+                <a asp-action="Profile" asp-controller="Profile" asp-route-id="@Model.AuthorId" class="text-decoration-none text-dark">
+                    <h6 class="mb-0">@Model.FullName</h6>
+                </a>
+            @if (Model.UpdatedAt is null)
+            {
+                <span class="post-date">@Model?.CreatedAt.ToString("MMM dd, yyyy")</span>
+            }
+            else
+            {
+                <span class="post-date">@Model?.UpdatedAt?.ToString("MMM dd, yyyy")</span>
+            }
+            @{
+                var visibilityLabel = Model?.Visibility switch
+                {
+                    Visibility.Public => "عام",
+                    Visibility.Friends => "الأصدقاء فقط",
+                    Visibility.Private => "خاص",
+                    _ => "غير معروف"
+                };
+                var visibilityIcon = Model?.Visibility switch
+                {
+                    Visibility.Public => "fas fa-globe",
+                    Visibility.Friends => "fas fa-user-friends",
+                    Visibility.Private => "fas fa-lock",
+                    _ => "fas fa-question-circle"
+                };
+            }
+            <i class="@visibilityIcon ms-1"></i> @visibilityLabel
+        </div>
+        </div>
+
+        @if(Model.AuthorId == userManager.GetUserId(User))
+        {
+        <div class="dropdown post-actions">
+            <button class="btn btn-sm btn-light border-0" type="button" id="postMenuButton-@Model.Id"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="postMenuButton-@Model.Id">
+                <li>
+                    <a class="dropdown-item text-primary" asp-action="EditPost" asp-controller="Post" asp-route-id="@Model.Id">
+                        <i class="fas fa-edit me-2"></i> تعديل المنشور
+                    </a>
+                </li>
+                <li>
+                    <form asp-action="DeletePost" asp-controller="Post" asp-route-id="@Model.Id" method="post"
+                          onsubmit="return confirm('هل أنت متأكد من حذف هذا المنشور؟');">
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="fas fa-trash-alt me-2"></i> حذف المنشور
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    }
+    </div>
+
+
+    <div class="post-body">
+        <span style="white-space: pre-line; margin: 0; padding: 0;">
+            @Html.Raw(Model.Content?.TrimStart('\r', '\n'))
+        </span>
+
+        @if (!string.IsNullOrEmpty(Model?.PictureURL))
+        {
+            <img src="~/Files/Posts/@Model.PictureURL"
+                 class="rounded post-image"
+                 style="max-width:100%; max-height:600px;"
+                 alt="No Image"
+                 data-bs-toggle="modal"
+                 data-bs-target="#imageModal"
+                 onclick="showImageModal('@Url.Content($"~/Files/Posts/{Model.PictureURL}")')">
+        }
+    </div>
+    <div class="card-footer post-footer">
+        <div class="reaction-summary">
+            @{
+                var likes = Model?.CountByType.GetValueOrDefault(ReactionType.Like);
+                var loves = Model?.CountByType.GetValueOrDefault(ReactionType.Love);
+                var hahas = Model?.CountByType.GetValueOrDefault(ReactionType.Haha);
+                var wows = Model?.CountByType.GetValueOrDefault(ReactionType.Wow);
+                var sads = Model?.CountByType.GetValueOrDefault(ReactionType.Sad);
+                var angries = Model?.CountByType.GetValueOrDefault(ReactionType.Angry);
+            }
+
+            @if (likes > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-thumbs-up text-primary"></i>
+                    <span>@likes</span>
+                </div>
+            }
+            @if (loves > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-heart text-danger"></i>
+                    <span>@loves</span>
+                </div>
+            }
+            @if (hahas > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-laugh-squint text-warning"></i>
+                    <span>@hahas</span>
+                </div>
+            }
+            @if (wows > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-surprise text-info"></i>
+                    <span>@wows</span>
+                </div>
+            }
+            @if (sads > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-sad-tear text-info"></i>
+                    <span>@sads</span>
+                </div>
+            }
+            @if (angries > 0)
+            {
+                <div class="reaction-item">
+                    <i class="fas fa-angry text-danger"></i>
+                    <span>@angries</span>
+                </div>
+            }
+        </div>
+
+
+        <div class="react-container">
+            <button class="btn btn-light react-button">
+                <i class="far fa-thumbs-up"></i> تفاعل
+            </button>
+
+            <div class="reaction-palette">
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Like"><i class="fas fa-thumbs-up text-primary"></i></button>
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Love"><i class="fas fa-heart text-danger"></i></button>
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Haha"><i class="fas fa-laugh-squint text-warning"></i></button>
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Wow"><i class="fas fa-surprise text-info"></i></button>
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Sad"><i class="fas fa-sad-tear text-info"></i></button>
+                <button class="reaction-icon" data-postid="@Model.Id" data-reactiontype="Angry"><i class="fas fa-angry text-danger"></i></button>
+            </div>
+        </div>
+
+
+        <button class="btn btn-light comment-button" data-postid="@Model.Id">
+            <i class="fas fa-comment"></i> تعليق
+        </button>
+
+        <button class="btn btn-light view-comments-button" data-postid="@Model.Id">
+            <i class="far fa-comments"></i> عرض التعليقات (@Model.CommentCount)
+        </button>
+
+        <div id="comments-container-@Model.Id" class="mt-3"></div>
+        <div id="comment-form-container-@Model.Id" class="mt-3" style="display:none;">
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showImageModal(imageUrl) {
+        document.getElementById("modalImage").src = imageUrl;
+    }
+</script>
+
+
+
+
+@section Scripts{
+    <script>
+        $(document).on('click', '.delete-post', function (e) {
+            e.preventDefault();
+            const postId = $(this).data('id');
+
+            if (confirm('هل أنت متأكد أنك تريد حذف هذا المنشور؟')) {
+                $.post('/Post/DeletePost/' + postId)
+                    .done(function () {
+                        alert('تم حذف المنشور بنجاح.');
+                        location.reload();
+                    })
+                    .fail(function () {
+                        alert('حدث خطأ أثناء الحذف.');
+                    });
+            }
+        });
+
+        $(document).on('click', '.Edit-post', function (e) {
+            e.preventDefault();
+            const postId = $(this).data('id');
+
+                $.post('/Post/EditPost/' + postId)
+                    .done(function () {
+                        alert('تم تعديل المنشور.');
+                        location.reload();
+                    })
+                    .fail(function () {
+                        alert('حدث خطأ أثناء الحظر.');
+                    });
+
+        });
+    </script>
+
+}

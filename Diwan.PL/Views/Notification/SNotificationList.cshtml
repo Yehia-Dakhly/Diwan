@@ -1,0 +1,31 @@
+﻿@model IEnumerable<NotificationViewModel>
+
+@if (Model != null && Model.Any())
+{
+    @foreach (var notification in Model)
+    {
+        <li class="notification-item @(notification.IsRead ? "read" : "unread")">
+            <a class="dropdown-item d-flex align-items-center"
+               asp-action="ReadNotification"
+               asp-route-id="@notification.Id"
+               asp-route-url="@notification.URL"
+               asp-controller="Notification">
+
+                <img src="~/Files/Images/@notification.PictureURL"
+                     alt="Profile"
+                     class="notification-img rounded-circle me-2" />
+
+                <div class="notification-content flex-grow-1">
+                    <small class="message d-block">@notification.Message</small>
+                    <small class="time text-muted">@notification.CreatedAt.ToShortTimeString()</small>
+                </div>
+            </a>
+        </li>
+    }
+}
+else
+{
+    <li>
+        <span class="dropdown-item text-muted text-center p-3">لا توجد إشعارات جديدة</span>
+    </li>
+}

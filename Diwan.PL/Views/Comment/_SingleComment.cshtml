@@ -1,0 +1,54 @@
+﻿@using Diwan.DAL.Models
+@using Microsoft.AspNetCore.Identity
+@model CommentViewModel
+@inject UserManager<DiwanUser> _userManager
+
+<div class="comment" dir="rtl">
+    <div class="comment-content d-flex flex-row">
+        <img src="~/Files/Images/@(string.IsNullOrEmpty(Model.AuthorPictureUrl) ? (Model.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png") : Model.AuthorPictureUrl)"
+             class="rounded-circle me-3 comment-avatar" alt="avatar" />
+
+        <div class="comment-main flex-grow-1">
+            <div class="comment-body p-2">
+                <strong>@Model.AuthorName</strong>
+                <span class="comment-text" style="white-space: pre-line; margin: 0; padding: 0;">
+                    @Html.Raw(Model.Content?.TrimStart('\r', '\n'))
+                </span>
+
+
+            </div>
+
+            <div class="comment-meta d-flex align-items-center mt-1">
+                <small class="text-muted">@Model.CreatedAt.ToShortDateString()</small>
+                <button type="button" class="btn btn-link btn-sm reply-button"
+                        data-commentid="@Model.Id" data-postid="@Model.PostId">
+                    رد
+                </button>
+
+                @if (_userManager.GetUserId(User) == Model.AuthorId)
+                {
+                    <form asp-action="Delete" asp-controller="Comment"
+                          asp-route-id="@Model.Id" method="post" class="me-2">
+                        <button type="submit" class="btn btn-link btn-sm text-danger"
+                                onclick="return confirm('هل تريد حذف هذا التعليق؟');">
+                            حذف
+                        </button>
+                    </form>
+                }
+            </div>
+
+            <div id="reply-form-container-@Model.Id"
+                 class="reply-form-container mt-2" style="display:none;"></div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Replies != null && Model.Replies.Any())
+{
+    @foreach (var reply in Model.Replies.OrderBy(r => r.CreatedAt))
+    {
+        <div class="comment @(reply.ParentId != null ? "reply" : "")">
+            <partial name="_SingleComment" model="reply" />
+        </div>
+    }
+}

@@ -1,0 +1,268 @@
+﻿@model Diwan.PL.ViewModels.UserProfileViewModel
+@using Diwan.DAL.Enums
+@{
+    ViewData["Title"] = (Model.FullName);
+}
+
+<div class="profile-container">
+    <div class="profile-header shadow-sm position-relative">
+        <img src="~/Files/Images/@Model.CoverPicURL" alt="Cover Photo" class="cover-photo" />
+        <img src="@Url.Content("~/Files/Images/" + (string.IsNullOrEmpty(Model.PictureURL)
+                                   ? (Model.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png")
+                                   : Model.PictureURL))"
+             alt="Profile Picture"
+             class="profile-picture"
+             data-bs-toggle="modal"
+             data-bs-target="#imageModal"
+             data-image-url='@Url.Content("~/Files/Images/" + (string.IsNullOrEmpty(Model.PictureURL)
+                                       ? (Model.Gender == Gender.Female ? "DefaultFemalePicture.png" : "DefaultMalePicture.png")
+                                       : Model.PictureURL))' />
+
+
+
+    </div>
+
+    <div class="profile-info">
+        <h1 class="profile-name">@Model.FullName</h1>
+        <p class="profile-bio">"@(Model.Bio ?? "قارئ وكاتب في ديوان")"</p>
+        <p class="profile-dob"><i class="fas fa-birthday-cake me-2"></i>@Model.DateOfBirth.ToString("dd MMMM yyyy")</p>
+    </div>
+
+    <div class="profile-actions">
+        @if (Model.IsCurrentUserProfile)
+        {
+            <a asp-action="EditProfile" asp-route-id="@Model.Id" asp-controller="Profile" class="btn btn-edit-profile">
+                تعديل الملف الشخصي
+            </a>
+        }
+        else
+        {
+            @if (Model.FriendshipStatus == null || Model.FriendshipStatus == FriendRequestStatus.Declined || Model.FriendshipStatus == FriendRequestStatus.Unknown)
+            {
+                <form asp-action="RequestFriend" asp-controller="Friendship" method="post" class="d-inline">
+                    <input type="hidden" name="addresseeId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-add-friend"><i class="fas fa-user-plus me-1"></i>إضافة صديق</button>
+                </form>
+            }
+            else if (Model.FriendshipStatus == FriendRequestStatus.Pending)
+            {
+                @if (Model.IsFriendshipInitiator)
+                {
+                    <button class="btn btn-secondary" disabled>تم إرسال الطلب</button>
+                }
+                else
+                {
+                    <a asp-action="AcceptRequest" asp-controller="Friendship" class="btn btn-info">الرد على الطلب</a>
+                }
+            }
+            else if (Model.FriendshipStatus == FriendRequestStatus.Accepted)
+            {
+                <button class="btn btn-primary" disabled><i class="fas fa-check"></i> أصدقاء</button>
+            }
+            else
+            {
+                <button class="btn btn-danger" disabled><i class="fas fa-ban"></i> محظور</button>
+            }
+        }
+    </div>
+
+    <hr class="divider" />
+
+    <div class="posts-section">
+        <h3 class="section-title">منشورات @Model.FullName</h3>
+        @if (Model.Posts != null && Model.Posts.Any())
+        {
+            <div class="posts-container" id="posts-container">
+                @await Html.PartialAsync("_PostListPartial", Model.Posts)
+            </div>
+        }
+        else
+        {
+            <p class="text-center text-muted">لم يقم هذا المستخدم بنشر أي شيء بعد.</p>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded shadow" alt="Expanded image">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    <script>
+        $(function () {
+            // Modal show: نحصل على data-image-url من الزر الذي فتح المودال ثم نضعها في img
+            $('#imageModal').on('show.bs.modal', function (event) {
+                var trigger = $(event.relatedTarget); // الزر الذي ضغط عليه المستخدم
+                var imageUrl = trigger.data('image-url');
+                $('#modalImage').attr('src', imageUrl || '');
+            });
+
+            // Modal hidden: نفضي src عشان نحرر الذاكرة
+            $('#imageModal').on('hidden.bs.modal', function () {
+                $('#modalImage').attr('src', '');
+            });
+</script>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            console.log("Page is ready. All scripts are now running.");
+
+                    $(document).on('click', '.comment-button', function () {
+            console.log("Comment button clicked!");
+            var postId = $(this).data('postid');
+            var container = $('#comment-form-container-' + postId);
+
+            if (container.is(':visible')) {
+                container.slideUp(200, function () {
+                    container.html('');
+                });
+                return;
+            }
+
+            $('.comment-form-container').hide().html('');
+            container.html('<div class="text-center p-3">Loading...</div>').slideDown();
+
+            $.get("/Comment/CreateComment?id=" + postId, function (data) {
+                container.html(data);
+            }).fail(function () {
+                container.html('<p class="text-danger text-center">Failed to load form.</p>');
+            });
+        });
+
+            $(document).on('click', '.view-comments-button', function () {
+                console.log("View comments button clicked!");
+                var postId = $(this).data('postid');
+                var container = $('#comments-container-' + postId);
+
+                if (container.is(':visible')) {
+                    container.slideUp().html('');
+                } else {
+                    container.html('<div class="text-center p-3"><div class="spinner-border spinner-border-sm"></div></div>').slideDown();
+                    $.get("/Comment/_GetCommentsPartial?postId=" + postId, function (data) {
+                        container.html(data);
+                    }).fail(function() {
+                        container.html('<p class="text-danger text-center">Failed to load comments.</p>');
+                    });
+                }
+            });
+
+                    $(document).on('click', '.reaction-icon', function (e) {
+            e.preventDefault();
+            var button = $(this);
+            var postId = button.data('postid');
+            var reactionTypeString = button.data('reactiontype');
+            var reactionTypeEnum = getReactionTypeEnum(reactionTypeString);
+
+            $.ajax({
+                url: '/Post/ToggleReaction',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ postId: postId, reactionType: reactionTypeEnum }),
+                success: function (response) {
+                    console.log("Reaction success:", response);
+
+
+                    if (response && response.countByType) {
+                        const postCard = button.closest('.post-card');
+                        const reactionSummary = postCard.find('.reaction-summary');
+                        reactionSummary.empty();
+
+                        const icons = {
+                            Like: '<i class="fas fa-thumbs-up text-primary"></i>',
+                            Love: '<i class="fas fa-heart text-danger"></i>',
+                            Haha: '<i class="fas fa-laugh-squint text-warning"></i>',
+                            Wow: '<i class="fas fa-surprise text-info"></i>',
+                            Sad: '<i class="fas fa-sad-tear text-info"></i>',
+                            Angry: '<i class="fas fa-angry text-danger"></i>'
+                        };
+
+                        for (const [type, count] of Object.entries(response.countByType)) {
+                            if (count > 0) {
+                                reactionSummary.append(
+                                    `<div class="reaction-item">${icons[type]} <span>${count}</span></div>`
+                                );
+                            }
+                        }
+                    }
+                },
+                error: function (xhr) {
+                    console.error("Reaction failed:", xhr.responseText);
+                }
+            });
+        });
+
+
+            function getReactionTypeEnum(reactionName) {
+                switch (reactionName) {
+                    case 'Like': return 1;
+                    case 'Love': return 2;
+                    case 'Haha': return 3;
+                    case 'Wow': return 4;
+                    case 'Sad': return 5;
+                    case 'Angry': return 6;
+                    default: return 0;
+                }
+            }
+
+        });
+        $(document).ready(function () {
+
+            $(document).on('click', '.reply-button', function () {
+                var commentId = $(this).data('commentid');
+                var postId = $(this).data('postid');
+                var container = $('#reply-form-container-' + commentId);
+                var isVisible = container.is(':visible');
+
+                $('.reply-form-container').hide().html('');
+
+                if (!isVisible) {
+                    container.html('<div class="spinner-border spinner-border-sm"></div>').show();
+
+                    $.get(`/Comment/ReplyComment?postId=${postId}&parentId=${commentId}`, function (data) {
+                        container.html(data);
+                    });
+                }
+            });
+        });
+
+
+
+           let currentPage = 1;
+        const pageSize = 5;
+        let isLoading = false;
+
+        async function loadMorePosts() {
+            if (isLoading) return;
+            isLoading = true;
+            currentPage++;
+
+            const container = document.getElementById("posts-container");
+
+            const userId = '@Model.Id';
+            const res = await fetch(`/Home/LoadUserPosts?id=${userId}&page=${currentPage}&pageSize=${pageSize}`);
+
+            const html = await res.text();
+
+            container.insertAdjacentHTML("beforeend", html);
+            isLoading = false;
+        }
+
+        window.addEventListener("scroll", () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                loadMorePosts();
+            }
+        });
+    </script>
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Profile.css" />
+
+}
+
+

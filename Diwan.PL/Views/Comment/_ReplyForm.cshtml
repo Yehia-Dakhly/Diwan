@@ -1,0 +1,16 @@
+﻿@model ReplyCommentViewModel
+
+<form asp-action="ReplyComment" asp-controller="Comment" method="post" class="reply-form-container">
+    <input type="hidden" asp-for="PostId" />
+    <input type="hidden" asp-for="ParentId" />
+
+    <div class="form-group">
+        <textarea asp-for="Content" rows="3" placeholder="اكتب ردك..." autofocus></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="reply-btn">نشر الرد</button>
+</form>
+@section Styles{
+    <link rel="stylesheet" href="~/css/Register.css" />
+}

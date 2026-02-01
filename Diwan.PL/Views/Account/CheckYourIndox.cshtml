@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "تحقق من بريدك الإلكتروني";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="outer-background">
+    <div class="login-container">
+        <h2 class="login-title">تحقق من بريدك الإلكتروني</h2>
+
+        <div class="login-form" style="text-align:center;">
+            <p style="font-size:16px; color:#5c3317; margin-bottom:25px;">
+                تم إرسال رابط لإعادة تعيين كلمة المرور إلى بريدك الإلكتروني.
+                يُرجى التحقق من صندوق الوارد الخاص بك.
+            </p>
+
+            <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank"
+               style="display:inline-block; background-color:#5c3317; color:#fff; padding:12px 25px; border-radius:6px;
+                      text-decoration:none; font-weight:600; transition:0.3s;">
+                الذهاب إلى البريد الإلكتروني
+            </a>
+
+            <p style="margin-top:25px; color:#5c3317; font-size:14px;">
+                لم يصلك البريد؟ <br />
+                تحقق من مجلد <strong>Spam / Junk</strong>.
+            </p>
+        </div>
+    </div>
+</div>
+
+@section _ValidationScriptsPartial {
+    <partial name="_ValidationScriptsPartial" />
+}
+@section AuthSection {
+    <link rel="stylesheet" href="~/css/Login.css" />
+}
